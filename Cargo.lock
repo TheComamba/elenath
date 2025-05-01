@@ -155,23 +155,33 @@ dependencies = [
 [[package]]
 name = "astro_coords"
 version = "0.1.0"
-source = "git+https://github.com/TheComamba/AstroCoords.git?branch=main#3b4a24bb6be10f36dd83042765cecb128ca9d44c"
+source = "git+https://github.com/TheComamba/AstroCoords.git?tag=before-uom#3b4a24bb6be10f36dd83042765cecb128ca9d44c"
 dependencies = [
  "serde",
  "simple-si-units",
 ]
 
 [[package]]
+name = "astro_coords"
+version = "0.1.0"
+source = "git+https://github.com/TheComamba/AstroCoords.git?branch=main#9b8f9f8a2fbd4c2c04865c70938ceb82bbc0795d"
+dependencies = [
+ "serde",
+ "uom",
+]
+
+[[package]]
 name = "astro_utils"
 version = "0.1.0"
-source = "git+https://github.com/TheComamba/AstroUtils.git?branch=main#9ae4c208f2839533c8158a4744f14fe1bfa5aa39"
+source = "git+https://github.com/TheComamba/AstroUtils.git?branch=main#873d245bec7b1807b9b3a3902549ecc1286ab7d0"
 dependencies = [
- "astro_coords",
+ "astro_coords 0.1.0 (git+https://github.com/TheComamba/AstroCoords.git?tag=before-uom)",
  "directories",
  "flate2",
  "fraction",
  "gaia_access",
  "lazy_static",
+ "parsec_access",
  "rand",
  "rand_distr",
  "rayon",
@@ -906,7 +916,7 @@ checksum = "60b1af1c220855b6ceac025d3f6ecdd2b7c4894bfe9cd9bda4fbb4bc7c0d4cf0"
 name = "elenath"
 version = "0.1.0"
 dependencies = [
- "astro_coords",
+ "astro_coords 0.1.0 (git+https://github.com/TheComamba/AstroCoords.git?branch=main)",
  "astro_utils",
  "iced",
  "iced_aw",
@@ -1326,6 +1336,12 @@ name = "glam"
 version = "0.25.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "151665d9be52f9bb40fc7966565d39666f2d1e69233571b71b87791c7e0528b3"
+
+[[package]]
+name = "glob"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a8d1add55171497b4705a648c6b583acafb01d58050a51727785f0b2c8e0a2b2"
 
 [[package]]
 name = "glow"
@@ -2369,12 +2385,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "num-bigint"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a5e44f723f1133c9deac646763579fdb3ac745e418f2a7af9cd0c431da1f20b9"
+dependencies = [
+ "num-integer",
+ "num-traits",
+ "serde",
+]
+
+[[package]]
 name = "num-complex"
 version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73f88a1307638156682bada9d7604135552957b7818057dcef22705b4d509495"
 dependencies = [
  "num-traits",
+ "serde",
 ]
 
 [[package]]
@@ -2405,6 +2433,7 @@ checksum = "f83d14da390562dca69fc84082e73e548e1ad308d24accdedd2720017cb37824"
 dependencies = [
  "num-integer",
  "num-traits",
+ "serde",
 ]
 
 [[package]]
@@ -2863,6 +2892,22 @@ dependencies = [
  "redox_syscall 0.5.8",
  "smallvec",
  "windows-targets 0.52.6",
+]
+
+[[package]]
+name = "parsec_access"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3fe093ba97634571ab3185d831addc3fc9846b36b0af9137e986e2e856f1a1db"
+dependencies = [
+ "directories",
+ "flate2",
+ "glob",
+ "lazy_static",
+ "rayon",
+ "reqwest",
+ "simple-si-units",
+ "tar",
 ]
 
 [[package]]
@@ -4177,6 +4222,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 
 [[package]]
+name = "typenum"
+version = "1.18.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1dccffe3ce07af9386bfd29e80c0ab1a8205a2fc34e4bcd40364df902cfa8f3f"
+
+[[package]]
 name = "uds_windows"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4252,6 +4303,20 @@ name = "untrusted"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
+
+[[package]]
+name = "uom"
+version = "0.36.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ffd36e5350a65d112584053ee91843955826bf9e56ec0d1351214e01f6d7cd9c"
+dependencies = [
+ "num-bigint",
+ "num-complex",
+ "num-rational",
+ "num-traits",
+ "serde",
+ "typenum",
+]
 
 [[package]]
 name = "url"
