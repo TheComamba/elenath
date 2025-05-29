@@ -5,9 +5,11 @@ use crate::gui::{
 };
 use astro_utils::astro_display::AstroDisplay;
 use iced::{
+    self,
     widget::{Button, Column, Radio, Row, Text, Toggler},
-    Alignment, Element, Length,
+    Alignment, Element,
 };
+use uom::si::{f64::Length, length::light_year};
 
 #[derive(Debug, Clone)]
 pub(crate) struct RandomizeStarsDialog {
@@ -33,9 +35,9 @@ impl RandomizeStarsDialog {
 
 fn max_generation_distance(distance: GenerationDistance) -> Length {
     match distance {
-        GenerationDistance::Decent => Distance::from_lyr(1000.0),
-        GenerationDistance::Realistic => Distance::from_lyr(5000.0),
-        GenerationDistance::VeryFar => Distance::from_lyr(25_000.0),
+        GenerationDistance::Decent => Length::new::<light_year>(1000.0),
+        GenerationDistance::Realistic => Length::new::<light_year>(5000.0),
+        GenerationDistance::VeryFar => Length::new::<light_year>(25_000.0),
     }
 }
 
@@ -108,7 +110,7 @@ impl Dialog for RandomizeStarsDialog {
             .push(submit_button)
             .padding(PADDING)
             .spacing(PADDING)
-            .width(Length::Fill)
+            .width(iced::Length::Fill)
             .align_x(Alignment::Center)
             .into()
     }

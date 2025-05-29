@@ -184,6 +184,7 @@ mod tests {
         real_data::stars::all::get_many_stars,
         units::luminous_intensity::absolute_magnitude_to_luminous_intensity,
     };
+    use uom::si::{f64::Length, length::light_year};
 
     use crate::model::celestial_system::{part::PartOfCelestialSystem, CelestialSystem};
 
@@ -219,7 +220,7 @@ mod tests {
         let stars = get_many_stars().iter().map(|s| s.to_star_data()).collect();
         system.add_stars_from_data(stars);
         let mut bright_star = SUN.to_star_data();
-        bright_star.set_distance_at_epoch(Distance::from_lyr(1.));
+        bright_star.set_distance_at_epoch(Length::new::<light_year>(1.));
         bright_star.set_luminous_intensity_at_epoch(absolute_magnitude_to_luminous_intensity(-10.));
         system.overwrite_star_data(Some(17), bright_star);
         let stars = system.get_stars();

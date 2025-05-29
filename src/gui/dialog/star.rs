@@ -11,9 +11,12 @@ use astro_utils::{
 };
 use iced::{
     widget::{text::Shaping, Button, Column, Row, Text},
-    Alignment, Element, Length,
+    Alignment, Element,
 };
-use uom::si::f64::{Angle, Time};
+use uom::si::{
+    f64::{Angle, Length, Time},
+    length::light_year,
+};
 
 use crate::gui::{gui_widget::PADDING, message::GuiMessage, shared_widgets::edit};
 
@@ -452,7 +455,7 @@ impl Dialog for StarDialog {
                 StarDialogEvent::DistanceChanged(distance_string) => {
                     if let Ok(distance) = distance_string.parse::<f64>() {
                         self.star
-                            .set_distance_at_epoch(Distance::from_lyr(distance));
+                            .set_distance_at_epoch(Length::new::<light_year>(distance));
                     }
                     self.distance_string = distance_string;
                 }
@@ -494,7 +497,7 @@ impl Dialog for StarDialog {
                     }
                 }
                 StarDialogEvent::Randomize => {
-                    let max_distance = Distance::from_lyr(2000.);
+                    let max_distance = Length::new::<light_year>(2000.);
                     let name = self.star.get_name().clone();
                     self.star = match generate_random_star(Some(max_distance)) {
                         Ok(star) => star,
