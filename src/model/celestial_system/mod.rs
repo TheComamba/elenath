@@ -5,11 +5,10 @@ use astro_utils::{
         constellation::Constellation, data::StarData, evolution::StarDataEvolution, fate::StarFate,
         physical_parameters::StarPhysicalParameters,
     },
-    units::{luminous_intensity::LUMINOSITY_ZERO, temperature::TEMPERATURE_ZERO, time::TIME_ZERO},
 };
 use serde::{Deserialize, Serialize};
-use simple_si_units::base::Time;
 use std::{cmp::Ordering, path::PathBuf};
+use uom::si::f64::Time;
 
 use super::star::Star;
 
@@ -24,13 +23,13 @@ pub(crate) struct CelestialSystem {
     planets: Vec<PlanetData>,
     distant_stars: Vec<Star>,
     constellations: Vec<Constellation>,
-    time_since_epoch: Time<f64>,
+    time_since_epoch: Time,
 }
 
 impl CelestialSystem {
     #[cfg(test)]
     pub(crate) fn new(mut central_body: StarData) -> Self {
-        central_body.set_distance_at_epoch(astro_utils::units::distance::DISTANCE_ZERO);
+        central_body.set_distance_at_epoch(DISTANCE_ZERO);
         CelestialSystem {
             central_body,
             planets: vec![],
@@ -59,7 +58,7 @@ impl CelestialSystem {
         }
     }
 
-    pub(crate) fn set_time_since_epoch(&mut self, time_since_epoch: Time<f64>) {
+    pub(crate) fn set_time_since_epoch(&mut self, time_since_epoch: Time) {
         self.time_since_epoch = time_since_epoch;
         for star in &mut self.distant_stars {
             star.recalculate_appearance_if_necessary(time_since_epoch);
@@ -67,7 +66,7 @@ impl CelestialSystem {
         self.update_constellations();
     }
 
-    pub(crate) fn get_time_since_epoch(&self) -> Time<f64> {
+    pub(crate) fn get_time_since_epoch(&self) -> Time {
         self.time_since_epoch
     }
 

@@ -8,20 +8,10 @@ use astro_utils::{
         random_planets::generate_random_planet,
     },
     stars::data::StarData,
-    units::{
-        angle::ANGLE_ZERO,
-        distance::{distance_to_earth_radii, DISTANCE_ZERO, EARTH_RADIUS},
-        mass::{EARTH_MASS, MASS_ZERO},
-        time::TIME_ZERO,
-    },
 };
 use iced::{
     widget::{text::Shaping, Button, Column, Row, Text},
     Alignment, Element, Length,
-};
-use simple_si_units::{
-    base::{Distance, Time},
-    geometry::Angle,
 };
 
 use crate::{

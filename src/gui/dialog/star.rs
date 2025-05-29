@@ -5,24 +5,15 @@ use astro_utils::{
         data::StarData, evolution::StarDataEvolution, physical_parameters::StarPhysicalParameters,
         random::random_stars::generate_random_star,
     },
-    units::{
-        distance::{distance_to_sun_radii, DISTANCE_ZERO, SOLAR_RADIUS},
-        luminous_intensity::{
-            absolute_magnitude_to_luminous_intensity, luminous_intensity_to_absolute_magnitude,
-            LUMINOSITY_ZERO,
-        },
-        mass::SOLAR_MASS,
-        temperature::TEMPERATURE_ZERO,
+    units::luminous_intensity::{
+        absolute_magnitude_to_luminous_intensity, luminous_intensity_to_absolute_magnitude,
     },
 };
 use iced::{
     widget::{text::Shaping, Button, Column, Row, Text},
     Alignment, Element, Length,
 };
-use simple_si_units::{
-    base::{Distance, Temperature, Time},
-    geometry::Angle,
-};
+use uom::si::f64::{Angle, Time};
 
 use crate::gui::{gui_widget::PADDING, message::GuiMessage, shared_widgets::edit};
 
@@ -33,7 +24,7 @@ pub(crate) struct StarDialog {
     star_dialog_type: StarDialogType,
     star: StarData,
     star_index: Option<usize>,
-    time_since_epoch: Time<f64>,
+    time_since_epoch: Time,
     mass_string: String,
     radius_string: String,
     luminosity_string: String,
@@ -56,7 +47,7 @@ const DEFAULT_ECLIPTIC: Ecliptic = Ecliptic {
 };
 
 impl StarDialog {
-    pub(crate) fn new(time_since_epoch: Time<f64>) -> Self {
+    pub(crate) fn new(time_since_epoch: Time) -> Self {
         let params = StarPhysicalParameters::new(None, None, LUMINOSITY_ZERO, TEMPERATURE_ZERO);
         let star = StarData::new(
             String::new(),
@@ -84,11 +75,7 @@ impl StarDialog {
         dialog
     }
 
-    pub(crate) fn edit(
-        star: StarData,
-        star_index: Option<usize>,
-        time_since_epoch: Time<f64>,
-    ) -> Self {
+    pub(crate) fn edit(star: StarData, star_index: Option<usize>, time_since_epoch: Time) -> Self {
         let mut dialog = StarDialog {
             star_dialog_type: StarDialogType::Edit,
             star,

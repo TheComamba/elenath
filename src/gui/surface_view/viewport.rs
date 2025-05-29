@@ -1,10 +1,7 @@
 use astro_coords::{direction::Direction, equatorial::Equatorial, spherical::Spherical, traits::*};
 use astro_utils::planets::{planet_data::PlanetData, surface_normal::surface_normal_at_time};
 use iced::Rectangle;
-use simple_si_units::{
-    base::Time,
-    geometry::{Angle, SolidAngle},
-};
+use uom::si::f64::{Angle, SolidAngle};
 
 pub(super) struct Viewport {
     pub(super) center_direction: Direction,
@@ -16,7 +13,7 @@ impl Viewport {
     pub(super) fn calculate(
         observer_normal: &Direction,
         local_view_direction: &Spherical,
-        opening_angle: SolidAngle<f64>,
+        opening_angle: SolidAngle,
         rotation_axis: &Direction,
         bounds: Rectangle,
     ) -> Self {
@@ -49,7 +46,7 @@ impl Viewport {
 pub(super) fn observer_normal(
     planet: &PlanetData,
     surface_position: Spherical,
-    time_since_epoch: Time<f64>,
+    time_since_epoch: Time,
 ) -> Direction {
     let observer_equatorial_position =
         Equatorial::new(surface_position, planet.get_rotation_axis().clone());
@@ -65,12 +62,11 @@ pub(super) fn observer_normal(
 
 #[cfg(test)]
 mod tests {
-    use astro_utils::units::solid_angle::SOLID_ANGLE_ZERO;
 
     use super::*;
 
     const TEST_ACCURACY: f64 = 1e-5;
-    const SOME_SOLID_ANGLE: SolidAngle<f64> = SolidAngle { sr: 1.0 };
+    const SOME_SOLID_ANGLE: SolidAngle = SolidAngle { sr: 1.0 };
     const SOME_SQUARE: Rectangle = Rectangle {
         x: 0.,
         y: 0.,

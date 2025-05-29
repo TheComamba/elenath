@@ -1,9 +1,10 @@
 use astro_coords::{
     cartesian::Cartesian, transformations::relative_direction::direction_relative_to_normal,
 };
-use astro_utils::{color::srgb::sRGBColor, stars::appearance::StarAppearance};
+use astro_utils::{
+    color::srgb::sRGBColor, stars::appearance::StarAppearance, units::illuminance::Illuminance,
+};
 use iced::{Color, Vector};
-use simple_si_units::electromagnetic::Illuminance;
 
 use crate::model::{celestial_system::CelestialSystem, planet::Planet};
 
@@ -21,7 +22,7 @@ impl CanvasAppearance {
     const MAX_RADIUS: f32 = 1e5;
     const RADIUS_EXPONENT: f32 = 0.23;
     const ALPHA_EXPONENT: f32 = 0.75;
-    const ILLUMINANCE_AT_MIN_RADIUS: Illuminance<f64> = Illuminance { lux: 8e-8 };
+    const ILLUMINANCE_AT_MIN_RADIUS: Illuminance = Illuminance { lux: 8e-8 };
 
     pub(super) fn from_star_appearance(
         appearance: &StarAppearance,
@@ -119,17 +120,12 @@ mod tests {
             orbit_parameters::OrbitParameters, physical_parameters::PlanetPhysicalParameters,
             planet_data::PlanetData,
         },
-        real_data::stars::SUN,
-        units::{
-            angle::ANGLE_ZERO, distance::EARTH_RADIUS,
-            illuminance::apparent_magnitude_to_illuminance, mass::EARTH_MASS, time::TIME_ZERO,
-        },
+        units::illuminance::apparent_magnitude_to_illuminance,
     };
-    use simple_si_units::{base::Distance, geometry::Angle};
 
     use super::*;
 
-    const SOME_ILLUMINANCE: Illuminance<f64> = Illuminance { lux: 100. };
+    const SOME_ILLUMINANCE: Illuminance = Illuminance { lux: 100. };
     const SOME_COLOR: sRGBColor = sRGBColor::from_sRGB(0., 1., 0.);
     const SOME_FLOAT: f32 = 1.;
 

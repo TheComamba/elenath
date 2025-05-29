@@ -1,5 +1,5 @@
 use crate::model::{planet::Planet, star::Star};
-use astro_utils::{astro_display::AstroDisplay, units::time::TIME_ZERO};
+use astro_utils::astro_display::AstroDisplay;
 
 pub(super) struct TableColData<T> {
     pub(super) header: &'static str,

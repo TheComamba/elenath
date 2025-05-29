@@ -8,7 +8,7 @@ use iced::{
     widget::{canvas, opaque, stack, Column, Container, Row, Text},
     Element, Length, Rectangle, Renderer, Theme,
 };
-use simple_si_units::base::Time;
+use uom::si::f64::Time;
 
 pub(super) const PADDING: f32 = 10.0;
 pub(super) const SMALL_COLUMN_WIDTH: f32 = 150.0;

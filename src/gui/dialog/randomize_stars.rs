@@ -8,7 +8,6 @@ use iced::{
     widget::{Button, Column, Radio, Row, Text, Toggler},
     Alignment, Element, Length,
 };
-use simple_si_units::base::Distance;
 
 #[derive(Debug, Clone)]
 pub(crate) struct RandomizeStarsDialog {
@@ -32,7 +31,7 @@ impl RandomizeStarsDialog {
     }
 }
 
-fn max_generation_distance(distance: GenerationDistance) -> Distance<f64> {
+fn max_generation_distance(distance: GenerationDistance) -> Length {
     match distance {
         GenerationDistance::Decent => Distance::from_lyr(1000.0),
         GenerationDistance::Realistic => Distance::from_lyr(5000.0),

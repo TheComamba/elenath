@@ -1,6 +1,6 @@
 use astro_coords::cartesian::Cartesian;
 use astro_utils::{
-    real_data::stars::{all::get_many_stars, SUN},
+    real_data::stars::all::get_many_stars,
     stars::{
         appearance::StarAppearance,
         data::StarData,
@@ -10,9 +10,10 @@ use astro_utils::{
         },
         random::random_stars::{generate_random_star, generate_random_stars},
     },
+    units::illuminance::Illuminance,
 };
-use simple_si_units::base::Distance;
 use std::cmp::Ordering;
+use uom::si::f64::Length;
 
 use crate::{
     error::ElenathError,
@@ -82,7 +83,7 @@ impl CelestialSystem {
     }
 
     fn sort_stars_by_brightness(&mut self) {
-        fn illum(b: &Star) -> &simple_si_units::electromagnetic::Illuminance<f64> {
+        fn illum(b: &Star) -> &Illuminance {
             b.get_appearance().get_illuminance()
         }
 
@@ -96,7 +97,7 @@ impl CelestialSystem {
     pub(crate) fn randomize_stars(
         &mut self,
         keep_central_body: bool,
-        max_distance: Distance<f64>,
+        max_distance: Length,
     ) -> Result<(), ElenathError> {
         if !keep_central_body {
             self.central_body = generate_random_star(None)?
@@ -180,10 +181,9 @@ impl CelestialSystem {
 #[cfg(test)]
 mod tests {
     use astro_utils::{
-        real_data::stars::{all::get_many_stars, SUN},
+        real_data::stars::all::get_many_stars,
         units::luminous_intensity::absolute_magnitude_to_luminous_intensity,
     };
-    use simple_si_units::base::Distance;
 
     use crate::model::celestial_system::{part::PartOfCelestialSystem, CelestialSystem};
 

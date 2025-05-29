@@ -18,7 +18,7 @@ impl CelestialSystem {
     }
 
     fn sort_planets_by_semimajor_axis(&mut self) {
-        fn sma(a: &PlanetData) -> simple_si_units::base::Distance<f64> {
+        fn sma(a: &PlanetData) -> Length {
             a.get_orbital_parameters().get_semi_major_axis()
         }
         self.planets

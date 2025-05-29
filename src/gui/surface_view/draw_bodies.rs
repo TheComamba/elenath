@@ -4,7 +4,7 @@ use iced::{
     widget::canvas::{self, path::lyon_path::geom::Transform, Frame, Path},
     Color, Point, Rectangle,
 };
-use simple_si_units::base::Distance;
+use uom::si::f64::Length;
 
 use crate::{
     gui::shared_canvas_functionality::{canvas_contains, draw_name},
@@ -150,7 +150,7 @@ impl SurfaceViewState {
         frame: &mut canvas::Frame,
         bounds: Rectangle,
         canvas_appearance: &Option<CanvasAppearance>,
-        radius: &Option<Distance<f64>>,
+        radius: &Option<Length>,
         pixel_per_viewport_width: f32,
         smallest_circle: Path,
         display_names: bool,
@@ -222,7 +222,7 @@ impl SurfaceViewState {
         &self,
         frame: &mut canvas::Frame,
         pos: Point,
-        radius: &Distance<f64>,
+        radius: &Length,
         relative_position: &Cartesian,
         color: Color,
         pixel_per_viewport_width: f32,
@@ -236,7 +236,7 @@ impl SurfaceViewState {
 }
 
 fn canvas_apparent_radius(
-    radius: &Distance<f64>,
+    radius: &Length,
     relative_position: &Cartesian,
     pixel_per_viewport_width: f32,
 ) -> f32 {

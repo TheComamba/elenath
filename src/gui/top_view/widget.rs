@@ -4,8 +4,8 @@ use iced::{
     widget::{canvas::Cache, Column},
     Alignment, Element, Length,
 };
-use simple_si_units::{base::Distance, geometry::Angle};
 use std::f64::consts::PI;
+use uom::si::f64::Angle;
 
 use crate::gui::{
     gui_widget::{BIG_COLUMN_WIDTH, PADDING},
@@ -17,15 +17,15 @@ pub(crate) struct TopViewState {
     pub(super) background_cache: Cache,
     pub(super) bodies_cache: Cache,
     pub(super) scale_cache: Cache,
-    pub(super) length_per_pixel: Distance<f64>,
+    pub(super) length_per_pixel: Length,
     pub(super) view_ecliptic: Ecliptic,
 }
 
 #[derive(Debug, Clone)]
 pub(crate) enum TopViewUpdate {
-    LengthScale(Distance<f64>),
-    ViewLongitude(Angle<f64>),
-    ViewLatitude(Angle<f64>),
+    LengthScale(Length),
+    ViewLongitude(Angle),
+    ViewLatitude(Angle),
 }
 
 impl From<TopViewUpdate> for GuiMessage {
@@ -77,7 +77,7 @@ impl TopViewState {
             TopViewUpdate::LengthScale(self.length_per_pixel / 2.),
             TopViewUpdate::LengthScale(self.length_per_pixel * 2.),
         );
-        const VIEW_ANGLE_STEP: Angle<f64> = Angle {
+        const VIEW_ANGLE_STEP: Angle = Angle {
             rad: 10. * 2. * PI / 360.,
         };
         let view_longitude = self.view_ecliptic.spherical.longitude;

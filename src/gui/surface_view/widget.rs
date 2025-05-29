@@ -3,40 +3,37 @@ use crate::gui::{
     message::GuiMessage,
     shared_widgets::control_field,
 };
-use astro_utils::{
-    astro_display::AstroDisplay,
-    units::angle::{normalized_angle, ANGLE_ZERO},
-};
+use astro_utils::{astro_display::AstroDisplay, units::angle::normalized_angle};
 use iced::{
     widget::{canvas, Column},
     Alignment, Element, Length,
 };
-use simple_si_units::geometry::{Angle, SolidAngle};
 use std::f64::consts::PI;
+use uom::si::f64::{Angle, SolidAngle};
 
-const HUMAN_EYE_OPENING_ANGLE: SolidAngle<f64> = SolidAngle { sr: 1. };
-const ANGLE_STEP: Angle<f64> = Angle {
+const HUMAN_EYE_OPENING_ANGLE: SolidAngle = SolidAngle { sr: 1. };
+const ANGLE_STEP: Angle = Angle {
     rad: 10. * 2. * PI / 360.,
 };
-const SRAD_STEP: SolidAngle<f64> = SolidAngle { sr: 0.1 };
+const SRAD_STEP: SolidAngle = SolidAngle { sr: 0.1 };
 
 pub(crate) struct SurfaceViewState {
     pub(super) background_cache: canvas::Cache,
     pub(super) bodies_cache: canvas::Cache,
-    pub(super) surface_longitude: Angle<f64>,
-    pub(super) surface_latitude: Angle<f64>,
-    pub(super) view_longitude: Angle<f64>,
-    pub(super) view_latitude: Angle<f64>,
-    pub(super) viewport_opening_angle: SolidAngle<f64>,
+    pub(super) surface_longitude: Angle,
+    pub(super) surface_latitude: Angle,
+    pub(super) view_longitude: Angle,
+    pub(super) view_latitude: Angle,
+    pub(super) viewport_opening_angle: SolidAngle,
 }
 
 #[derive(Debug, Clone)]
 pub(crate) enum SurfaceViewUpdate {
-    SurfaceLongitude(Angle<f64>),
-    SurfaceLatitude(Angle<f64>),
-    ViewLongitude(Angle<f64>),
-    ViewLatitude(Angle<f64>),
-    ViewportOpeningAngle(SolidAngle<f64>),
+    SurfaceLongitude(Angle),
+    SurfaceLatitude(Angle),
+    ViewLongitude(Angle),
+    ViewLatitude(Angle),
+    ViewportOpeningAngle(SolidAngle),
 }
 
 impl From<SurfaceViewUpdate> for GuiMessage {
