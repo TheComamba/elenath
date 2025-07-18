@@ -8,7 +8,7 @@ use iced::{
     widget::{canvas, opaque, stack, Column, Container, Row, Text},
     Element, Length, Rectangle, Renderer, Theme,
 };
-use uom::si::f64::Time;
+use uom::si::{f64::Time, time::day};
 
 pub(super) const PADDING: f32 = 10.0;
 pub(super) const SMALL_COLUMN_WIDTH: f32 = 150.0;
@@ -29,7 +29,7 @@ impl Default for Gui {
             surface_view_state: SurfaceViewState::new(),
             top_view_state: TopViewState::new(),
             table_view_state: TableViewState::new(),
-            time_step: Time::from_days(1.0),
+            time_step: Time::new::<day>(1.0),
             celestial_system: None,
             selected_planet_name: String::new(),
             display_names: true,

@@ -5,8 +5,11 @@ use astro_utils::{
         data::StarData, evolution::StarDataEvolution, physical_parameters::StarPhysicalParameters,
         random::random_stars::generate_random_star,
     },
-    units::luminous_intensity::{
-        absolute_magnitude_to_luminous_intensity, luminous_intensity_to_absolute_magnitude,
+    units::{
+        luminosity::Luminosity,
+        luminous_intensity::{
+            absolute_magnitude_to_luminous_intensity, luminous_intensity_to_absolute_magnitude,
+        },
     },
 };
 use iced::{
@@ -14,8 +17,11 @@ use iced::{
     Alignment, Element,
 };
 use uom::si::{
-    f64::{Angle, Length, ThermodynamicTemperature, Time},
+    angle::degree,
+    f64::{Angle, Length, LuminousIntensity, ThermodynamicTemperature, Time},
     length::light_year,
+    luminous_intensity::candela,
+    power::watt,
     thermodynamic_temperature::kelvin,
 };
 
@@ -55,7 +61,7 @@ impl StarDialog {
         let params = StarPhysicalParameters::new(
             None,
             None,
-            LUMINOSITY_ZERO,
+            LuminousIntensity::new::<candela>(0.),
             ThermodynamicTemperature::new::<kelvin>(0.),
         );
         let star = StarData::new(
@@ -63,7 +69,7 @@ impl StarDialog {
             None,
             params,
             Cartesian::origin(),
-            StarDataEvolution::NONE,
+            StarDataEvolution::none(),
         );
         let mut dialog = StarDialog {
             star_dialog_type: StarDialogType::New,

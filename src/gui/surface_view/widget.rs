@@ -9,7 +9,11 @@ use iced::{
     Alignment, Element, Length,
 };
 use std::f64::consts::PI;
-use uom::si::f64::{Angle, SolidAngle};
+use uom::si::{
+    angle::degree,
+    f64::{Angle, SolidAngle},
+    solid_angle::steradian,
+};
 
 const HUMAN_EYE_OPENING_ANGLE: SolidAngle = SolidAngle { sr: 1. };
 const ANGLE_STEP: Angle = Angle {
@@ -84,8 +88,8 @@ impl SurfaceViewState {
             SurfaceViewUpdate::ViewportOpeningAngle(mut angle) => {
                 if angle < SRAD_STEP {
                     angle = SRAD_STEP;
-                } else if angle.to_sr() > 2. * PI {
-                    angle = SolidAngle::from_sr(2. * PI);
+                } else if angle.get::<steradian>() > 2. * PI {
+                    angle = SolidAngle::new::<steradian>(2. * PI);
                 }
                 self.viewport_opening_angle = angle;
             }

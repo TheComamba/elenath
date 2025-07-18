@@ -44,7 +44,7 @@ impl Star {
     pub(super) fn recalculate_appearance_if_necessary(&mut self, time_since_epoch: Time) {
         if let Some(data) = &self.data {
             let then = self.appearance.get_time_since_epoch();
-            if data.has_changed(*then, time_since_epoch) {
+            if data.has_changed(then, time_since_epoch) {
                 self.appearance = data.to_star_appearance(time_since_epoch);
             }
         }

@@ -9,7 +9,8 @@ use astro_utils::{
 use serde::{Deserialize, Serialize};
 use std::{cmp::Ordering, path::PathBuf};
 use uom::si::{
-    f64::{ThermodynamicTemperature, Time},
+    f64::{LuminousIntensity, ThermodynamicTemperature, Time},
+    luminous_intensity::candela,
     thermodynamic_temperature::kelvin,
     time::year,
 };
@@ -49,7 +50,7 @@ impl CelestialSystem {
         let central_body_params = StarPhysicalParameters::new(
             None,
             None,
-            LUMINOSITY_ZERO,
+            LuminousIntensity::new::<candela>(0.),
             ThermodynamicTemperature::new::<kelvin>(0.),
         );
         let central_body = StarData::new(

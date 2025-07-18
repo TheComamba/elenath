@@ -120,7 +120,15 @@ mod tests {
             orbit_parameters::OrbitParameters, physical_parameters::PlanetPhysicalParameters,
             planet_data::PlanetData,
         },
-        units::illuminance::apparent_magnitude_to_illuminance,
+        units::{
+            illuminance::apparent_magnitude_to_illuminance, length::earth_radii, mass::earth_mass,
+        },
+    };
+    use uom::si::{
+        angle::degree,
+        f64::{Angle, Length, Mass, Time},
+        length::astronomical_unit,
+        time::year,
     };
 
     use super::*;
@@ -632,8 +640,8 @@ mod tests {
             Angle::new::<degree>(0.),
         );
         let planet_physical_params = PlanetPhysicalParameters::new(
-            EARTH_MASS,
-            EARTH_RADIUS,
+            Mass::new::<earth_mass>(1.),
+            Length::new::<earth_radii>(1.),
             1.,
             sRGBColor::from_sRGB(1., 1., 1.),
             Time::new::<year>(0.),

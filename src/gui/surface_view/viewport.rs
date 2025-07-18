@@ -1,7 +1,11 @@
 use astro_coords::{direction::Direction, equatorial::Equatorial, spherical::Spherical, traits::*};
 use astro_utils::planets::{planet_data::PlanetData, surface_normal::surface_normal_at_time};
 use iced::Rectangle;
-use uom::si::f64::{Angle, SolidAngle};
+use uom::si::{
+    angle::{degree, radian},
+    f64::{Angle, SolidAngle, Time},
+    solid_angle::steradian,
+};
 
 pub(super) struct Viewport {
     pub(super) center_direction: Direction,
@@ -29,11 +33,10 @@ impl Viewport {
         let aspect_ration = bounds.width / bounds.height;
         // A = a * b = a^2 * aspect_ratio
         // a = sqrt(A / aspect_ratio)
-        let vertical_angle = Angle {
-            rad: (opening_angle.sr / aspect_ration as f64).sqrt(),
-        };
+        let vertical_angle = (opening_angle.get::<steradian>() / aspect_ration as f64).sqrt();
+        let vertical_angle = Angle::new::<radian>(vertical_angle);
         let top_direction = center_direction.rotated(vertical_angle / 2., &ortho);
-        let viewport_height = (vertical_angle / 2.).rad.sin() * 2.; //Viewport is at unit distance
+        let viewport_height = (vertical_angle / 2.).get::<radian>().sin() * 2.; //Viewport is at unit distance
         let px_per_distance = bounds.height / viewport_height as f32;
         Self {
             center_direction,
@@ -62,9 +65,6 @@ pub(super) fn observer_normal(
 
 #[cfg(test)]
 mod tests {
-
-    use uom::si::angle::degree;
-
     use super::*;
 
     const TEST_ACCURACY: f64 = 1e-5;
@@ -202,7 +202,7 @@ mod tests {
         let viewport = Viewport::calculate(
             &observer_normal,
             &view_direction,
-            SOLID_Angle::new::<degree>(0.),
+            SolidAngle::new::<steradian>(0.),
             &rotation_axis,
             SOME_SQUARE,
         );
@@ -222,7 +222,7 @@ mod tests {
         let viewport = Viewport::calculate(
             &observer_normal,
             &view_direction,
-            opening_solid_angle,
+            opening_solid_angle.into(),
             &rotation_axis,
             SOME_SQUARE,
         );
@@ -243,7 +243,7 @@ mod tests {
         let viewport = Viewport::calculate(
             &observer_normal,
             &view_direction,
-            opening_solid_angle,
+            opening_solid_angle.into(),
             &rotation_axis,
             SOME_SQUARE,
         );
