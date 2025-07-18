@@ -119,7 +119,7 @@ impl TopViewState {
     ) {
         let time = celestial_system.get_time_since_epoch();
         let data = celestial_system.get_central_body_data();
-        let pos3d = Cartesian::ORIGIN;
+        let pos3d = Cartesian::origin();
         let color = sRGBColor::from_temperature(data.get_temperature(time));
         let radius = data.get_radius(time).unwrap_or(DISTANCE_ZERO);
         let body = BodyParams {

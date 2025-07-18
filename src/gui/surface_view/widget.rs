@@ -47,10 +47,10 @@ impl SurfaceViewState {
         SurfaceViewState {
             background_cache: canvas::Cache::default(),
             bodies_cache: canvas::Cache::default(),
-            surface_longitude: ANGLE_ZERO,
-            surface_latitude: ANGLE_ZERO,
-            view_longitude: ANGLE_ZERO,
-            view_latitude: Angle::from_degrees(90.),
+            surface_longitude: Angle::new::<degree>(0.),
+            surface_latitude: Angle::new::<degree>(0.),
+            view_longitude: Angle::new::<degree>(0.),
+            view_latitude: Angle::new::<degree>(90.),
             viewport_opening_angle: HUMAN_EYE_OPENING_ANGLE,
         }
     }
@@ -62,10 +62,10 @@ impl SurfaceViewState {
                 self.surface_longitude = longitude;
             }
             SurfaceViewUpdate::SurfaceLatitude(mut latitude) => {
-                if latitude.to_degrees() < -90. {
-                    latitude = Angle::from_degrees(-90.);
-                } else if latitude.to_degrees() > 90. {
-                    latitude = Angle::from_degrees(90.);
+                if latitude.get::<degree>() < -90. {
+                    latitude = Angle::new::<degree>(-90.);
+                } else if latitude.get::<degree>() > 90. {
+                    latitude = Angle::new::<degree>(90.);
                 }
                 self.surface_latitude = latitude;
             }
@@ -76,8 +76,8 @@ impl SurfaceViewState {
             SurfaceViewUpdate::ViewLatitude(mut latitude) => {
                 if latitude < ANGLE_STEP {
                     latitude = ANGLE_STEP;
-                } else if latitude.to_degrees() > 90. {
-                    latitude = Angle::from_degrees(90.);
+                } else if latitude.get::<degree>() > 90. {
+                    latitude = Angle::new::<degree>(90.);
                 }
                 self.view_latitude = latitude;
             }

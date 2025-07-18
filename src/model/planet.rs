@@ -50,7 +50,7 @@ fn calc_pos(central_body: &StarData, time: Time, data: &PlanetData) -> Cartesian
         data.get_orbital_parameters()
             .calculate_position(data.get_mass(), central_body_mass, time)
     } else {
-        Cartesian::ORIGIN
+        Cartesian::origin()
     };
     pos
 }

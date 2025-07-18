@@ -83,12 +83,12 @@ impl CelestialSystem {
     }
 
     fn sort_stars_by_brightness(&mut self) {
-        fn illum(b: &Star) -> &Illuminance {
+        fn illum(b: &Star) -> Illuminance {
             b.get_appearance().get_illuminance()
         }
 
         self.distant_stars
-            .sort_by(|a, b| illum(b).partial_cmp(illum(a)).unwrap_or(Ordering::Equal));
+            .sort_by(|a, b| illum(b).partial_cmp(&illum(a)).unwrap_or(Ordering::Equal));
         for (i, star) in self.distant_stars.iter_mut().enumerate() {
             star.set_index(i);
         }
@@ -192,7 +192,10 @@ mod tests {
     fn central_body_has_distance_zero() {
         for star in get_many_stars().iter() {
             let system = CelestialSystem::new(star.to_star_data());
-            assert!(system.get_central_body_data().get_distance_at_epoch() < Distance::from_m(1.));
+            assert!(
+                system.get_central_body_data().get_distance_at_epoch()
+                    < Length::new::<light_year>(1e-20)
+            );
         }
     }
 

@@ -14,8 +14,9 @@ use iced::{
     Alignment, Element,
 };
 use uom::si::{
-    f64::{Angle, Length, Time},
+    f64::{Angle, Length, ThermodynamicTemperature, Time},
     length::light_year,
+    thermodynamic_temperature::kelvin,
 };
 
 use crate::gui::{gui_widget::PADDING, message::GuiMessage, shared_widgets::edit};
@@ -51,12 +52,17 @@ const DEFAULT_ECLIPTIC: Ecliptic = Ecliptic {
 
 impl StarDialog {
     pub(crate) fn new(time_since_epoch: Time) -> Self {
-        let params = StarPhysicalParameters::new(None, None, LUMINOSITY_ZERO, TEMPERATURE_ZERO);
+        let params = StarPhysicalParameters::new(
+            None,
+            None,
+            LUMINOSITY_ZERO,
+            ThermodynamicTemperature::new::<kelvin>(0.),
+        );
         let star = StarData::new(
             String::new(),
             None,
             params,
-            Cartesian::ORIGIN,
+            Cartesian::origin(),
             StarDataEvolution::NONE,
         );
         let mut dialog = StarDialog {
@@ -128,7 +134,7 @@ impl StarDialog {
                 .unwrap_or(DEFAULT_ECLIPTIC)
                 .spherical
                 .longitude
-                .to_degrees()
+                .get::<degree>()
         );
         self.latitude_string = format!(
             "{:.2}",
@@ -138,7 +144,7 @@ impl StarDialog {
                 .unwrap_or(DEFAULT_ECLIPTIC)
                 .spherical
                 .latitude
-                .to_degrees()
+                .get::<degree>()
         );
     }
 
@@ -466,7 +472,7 @@ impl Dialog for StarDialog {
                             .get_pos_at_epoch()
                             .to_ecliptic()
                             .unwrap_or(DEFAULT_ECLIPTIC);
-                        pos.spherical.longitude = Angle::from_degrees(longitude);
+                        pos.spherical.longitude = Angle::new::<degree>(longitude);
                         let pos = pos
                             .to_direction()
                             .to_cartesian(self.star.get_distance_at_epoch());
@@ -481,7 +487,7 @@ impl Dialog for StarDialog {
                             .get_pos_at_epoch()
                             .to_ecliptic()
                             .unwrap_or(DEFAULT_ECLIPTIC);
-                        pos.spherical.latitude = Angle::from_degrees(latitude);
+                        pos.spherical.latitude = Angle::new::<degree>(latitude);
                         let pos = pos
                             .to_direction()
                             .to_cartesian(self.star.get_distance_at_epoch());

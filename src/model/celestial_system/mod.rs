@@ -8,7 +8,11 @@ use astro_utils::{
 };
 use serde::{Deserialize, Serialize};
 use std::{cmp::Ordering, path::PathBuf};
-use uom::si::f64::Time;
+use uom::si::{
+    f64::{ThermodynamicTemperature, Time},
+    thermodynamic_temperature::kelvin,
+    time::year,
+};
 
 use super::star::Star;
 
@@ -29,32 +33,38 @@ pub(crate) struct CelestialSystem {
 impl CelestialSystem {
     #[cfg(test)]
     pub(crate) fn new(mut central_body: StarData) -> Self {
-        central_body.set_distance_at_epoch(DISTANCE_ZERO);
+        use uom::si::{f64::Length, length::light_year, time::year};
+
+        central_body.set_distance_at_epoch(Length::new::<light_year>(0.));
         CelestialSystem {
             central_body,
             planets: vec![],
             distant_stars: vec![],
             constellations: vec![],
-            time_since_epoch: TIME_ZERO,
+            time_since_epoch: Time::new::<year>(0.),
         }
     }
 
     pub(crate) fn empty() -> Self {
-        let central_body_params =
-            StarPhysicalParameters::new(None, None, LUMINOSITY_ZERO, TEMPERATURE_ZERO);
+        let central_body_params = StarPhysicalParameters::new(
+            None,
+            None,
+            LUMINOSITY_ZERO,
+            ThermodynamicTemperature::new::<kelvin>(0.),
+        );
         let central_body = StarData::new(
             "".to_string(),
             None,
             central_body_params,
-            Cartesian::ORIGIN,
-            StarDataEvolution::NONE,
+            Cartesian::origin(),
+            StarDataEvolution::none(),
         );
         CelestialSystem {
             central_body,
             planets: vec![],
             distant_stars: vec![],
             constellations: vec![],
-            time_since_epoch: TIME_ZERO,
+            time_since_epoch: Time::new::<year>(0.),
         }
     }
 

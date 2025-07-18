@@ -4,7 +4,7 @@ use iced::{
     widget::canvas::{self, path::lyon_path::geom::Transform, Frame, Path},
     Color, Point, Rectangle,
 };
-use uom::si::f64::Length;
+use uom::si::{f64::Length, length::astronomical_unit};
 
 use crate::{
     gui::shared_canvas_functionality::{canvas_contains, draw_name},
@@ -240,5 +240,7 @@ fn canvas_apparent_radius(
     relative_position: &Cartesian,
     pixel_per_viewport_width: f32,
 ) -> f32 {
-    (radius / &relative_position.length()) as f32 * pixel_per_viewport_width
+    (radius.get::<astronomical_unit>() / relative_position.length().get::<astronomical_unit>())
+        as f32
+        * pixel_per_viewport_width
 }
