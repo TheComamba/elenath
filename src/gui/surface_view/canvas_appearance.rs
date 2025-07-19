@@ -2,7 +2,9 @@ use astro_coords::{
     cartesian::Cartesian, transformations::relative_direction::direction_relative_to_normal,
 };
 use astro_utils::{
-    color::srgb::sRGBColor, stars::appearance::StarAppearance, units::illuminance::Illuminance,
+    color::srgb::sRGBColor,
+    stars::appearance::StarAppearance,
+    units::illuminance::{lux, Illuminance},
 };
 use iced::{Color, Vector};
 
@@ -22,7 +24,11 @@ impl CanvasAppearance {
     const MAX_RADIUS: f32 = 1e5;
     const RADIUS_EXPONENT: f32 = 0.23;
     const ALPHA_EXPONENT: f32 = 0.75;
-    const ILLUMINANCE_AT_MIN_RADIUS: Illuminance = Illuminance { lux: 8e-8 };
+
+    #[inline(always)]
+    fn illuminance_at_min_radius() -> Illuminance {
+        Illuminance::new::<lux>(8e-8)
+    }
 
     pub(super) fn from_star_appearance(
         appearance: &StarAppearance,
@@ -77,7 +83,7 @@ impl CanvasAppearance {
         let (r, g, b) = color.maximized_sRGB_tuple();
 
         let illuminance = body.get_illuminance();
-        let ratio = (illuminance / &Self::ILLUMINANCE_AT_MIN_RADIUS) as f32;
+        let ratio = (illuminance / Self::illuminance_at_min_radius()).value as f32;
         if ratio < 1. {
             let radius = Self::MIN_RADIUS;
             let alpha = ratio.powf(Self::ALPHA_EXPONENT);
@@ -125,7 +131,7 @@ mod tests {
         },
     };
     use uom::si::{
-        angle::degree,
+        angle::{degree, radian},
         f64::{Angle, Length, Mass, Time},
         length::astronomical_unit,
         time::year,
@@ -133,7 +139,9 @@ mod tests {
 
     use super::*;
 
-    const SOME_ILLUMINANCE: Illuminance = Illuminance { lux: 100. };
+    fn some_illuminance() -> Illuminance {
+        Illuminance::new::<lux>(100.)
+    }
     const SOME_COLOR: sRGBColor = sRGBColor::from_sRGB(0., 1., 0.);
     const SOME_FLOAT: f32 = 1.;
 
@@ -160,7 +168,7 @@ mod tests {
                     };
                     let star_appearance = StarAppearance::new(
                         String::new(),
-                        SOME_ILLUMINANCE,
+                        some_illuminance(),
                         SOME_COLOR,
                         center_direction.to_ecliptic(),
                         Time::new::<year>(0.),
@@ -215,36 +223,40 @@ mod tests {
                                 if half_opening_angle.get::<degree>().abs() > 89. {
                                     continue;
                                 }
-                                let expected_offset =
-                                    half_opening_angle.rad.sin() as f32 * viewport.px_per_distance;
+                                let expected_offset = half_opening_angle.get::<radian>().sin()
+                                    as f32
+                                    * viewport.px_per_distance;
 
-                                println!("half opening angle: {}", half_opening_angle);
+                                println!(
+                                    "half opening angle: {}",
+                                    half_opening_angle.astro_display()
+                                );
                                 println!("expected offset: {}", expected_offset);
 
                                 let top = StarAppearance::new(
                                     String::new(),
-                                    SOME_ILLUMINANCE,
+                                    some_illuminance(),
                                     SOME_COLOR,
                                     top.to_ecliptic(),
                                     Time::new::<year>(0.),
                                 );
                                 let left = StarAppearance::new(
                                     String::new(),
-                                    SOME_ILLUMINANCE,
+                                    some_illuminance(),
                                     SOME_COLOR,
                                     left.to_ecliptic(),
                                     Time::new::<year>(0.),
                                 );
                                 let bottom = StarAppearance::new(
                                     String::new(),
-                                    SOME_ILLUMINANCE,
+                                    some_illuminance(),
                                     SOME_COLOR,
                                     bottom.to_ecliptic(),
                                     Time::new::<year>(0.),
                                 );
                                 let right = StarAppearance::new(
                                     String::new(),
-                                    SOME_ILLUMINANCE,
+                                    some_illuminance(),
                                     SOME_COLOR,
                                     right.to_ecliptic(),
                                     Time::new::<year>(0.),
@@ -318,7 +330,7 @@ mod tests {
                 println!("star direction: {}", star_direction);
                 let star = StarAppearance::new(
                     "".to_string(),
-                    SOME_ILLUMINANCE,
+                    some_illuminance(),
                     SOME_COLOR,
                     star_direction.to_ecliptic(),
                     Time::new::<year>(0.),
@@ -353,7 +365,7 @@ mod tests {
                 println!("star direction: {}", star_direction);
                 let star = StarAppearance::new(
                     "".to_string(),
-                    SOME_ILLUMINANCE,
+                    some_illuminance(),
                     SOME_COLOR,
                     star_direction.to_ecliptic(),
                     Time::new::<year>(0.),
@@ -614,7 +626,7 @@ mod tests {
                 println!(
                     "illuminance: {} ({:2.2e} lux)",
                     illuminance.astro_display(),
-                    illuminance.lux,
+                    illuminance.get::<lux>(),
                 );
                 println!("radius: {}, alpha: {}", radius, color.a);
                 println!(

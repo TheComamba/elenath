@@ -53,6 +53,7 @@ enum StarDialogType {
     Edit,
 }
 
+#[inline(always)]
 fn default_ecliptic() -> Ecliptic {
     let zero = Angle::new::<degree>(0.);
     Ecliptic {

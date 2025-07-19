@@ -68,13 +68,17 @@ mod tests {
     use super::*;
 
     const TEST_ACCURACY: f64 = 1e-5;
-    const SOME_SOLID_ANGLE: SolidAngle = SolidAngle { sr: 1.0 };
     const SOME_SQUARE: Rectangle = Rectangle {
         x: 0.,
         y: 0.,
         width: 100.,
         height: 100.,
     };
+
+    #[inline(always)]
+    fn some_solid_angle() -> SolidAngle {
+        SolidAngle::new::<steradian>(1.0)
+    }
 
     fn example_directions() -> Vec<Direction> {
         let ordinates = vec![-1., 0., 1., 12.];
@@ -99,7 +103,7 @@ mod tests {
                 let viewport = Viewport::calculate(
                     &observer_normal,
                     &view_direction,
-                    SOME_SOLID_ANGLE,
+                    some_solid_angle(),
                     &rotation_axis,
                     SOME_SQUARE,
                 );
@@ -121,28 +125,28 @@ mod tests {
         let westward_viewport = Viewport::calculate(
             &observer_normal,
             &west_view,
-            SOME_SOLID_ANGLE,
+            some_solid_angle(),
             &rotation_axis,
             SOME_SQUARE,
         );
         let southward_viewport = Viewport::calculate(
             &observer_normal,
             &south_view,
-            SOME_SOLID_ANGLE,
+            some_solid_angle(),
             &rotation_axis,
             SOME_SQUARE,
         );
         let eastward_viewport = Viewport::calculate(
             &observer_normal,
             &east_view,
-            SOME_SOLID_ANGLE,
+            some_solid_angle(),
             &rotation_axis,
             SOME_SQUARE,
         );
         let northward_viewport = Viewport::calculate(
             &observer_normal,
             &north_view,
-            SOME_SOLID_ANGLE,
+            some_solid_angle(),
             &rotation_axis,
             SOME_SQUARE,
         );
@@ -169,7 +173,7 @@ mod tests {
                     let viewport = Viewport::calculate(
                         &observer_normal,
                         &view_direction,
-                        SOME_SOLID_ANGLE,
+                        some_solid_angle(),
                         &rotation_axis,
                         SOME_SQUARE,
                     );
