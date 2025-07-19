@@ -217,7 +217,7 @@ impl Gui {
             }
             GuiMessage::DialogSubmit => {
                 if let Some(dialog) = &self.dialog {
-                    self.handle_message(dialog.on_submit());
+                    self.handle_message(dialog.on_submit())?;
                 }
             }
         }
