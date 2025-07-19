@@ -1,5 +1,6 @@
 use crate::model::{planet::Planet, star::Star};
-use astro_utils::{astro_display::AstroDisplay, units::time::TIME_ZERO};
+use astro_utils::astro_display::AstroDisplay;
+use uom::si::{f64::Time, time::year};
 
 pub(super) struct TableColData<T> {
     pub(super) header: &'static str,
@@ -283,7 +284,9 @@ impl TableColData<Star> {
             TableColData {
                 header: "Time Until Death",
                 content_closure: Box::new(|body| {
-                    let time_until_death = body.get_data()?.get_time_until_death(TIME_ZERO)?;
+                    let time_until_death =
+                        body.get_data()?
+                            .get_time_until_death(Time::new::<year>(0.))?;
                     Some(time_until_death.astro_display())
                 }),
             },

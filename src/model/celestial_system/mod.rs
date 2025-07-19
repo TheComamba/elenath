@@ -5,11 +5,15 @@ use astro_utils::{
         constellation::Constellation, data::StarData, evolution::StarDataEvolution, fate::StarFate,
         physical_parameters::StarPhysicalParameters,
     },
-    units::{luminous_intensity::LUMINOSITY_ZERO, temperature::TEMPERATURE_ZERO, time::TIME_ZERO},
 };
 use serde::{Deserialize, Serialize};
-use simple_si_units::base::Time;
 use std::{cmp::Ordering, path::PathBuf};
+use uom::si::{
+    f64::{LuminousIntensity, ThermodynamicTemperature, Time},
+    luminous_intensity::candela,
+    thermodynamic_temperature::kelvin,
+    time::year,
+};
 
 use super::star::Star;
 
@@ -24,42 +28,48 @@ pub(crate) struct CelestialSystem {
     planets: Vec<PlanetData>,
     distant_stars: Vec<Star>,
     constellations: Vec<Constellation>,
-    time_since_epoch: Time<f64>,
+    time_since_epoch: Time,
 }
 
 impl CelestialSystem {
     #[cfg(test)]
     pub(crate) fn new(mut central_body: StarData) -> Self {
-        central_body.set_distance_at_epoch(astro_utils::units::distance::DISTANCE_ZERO);
+        use uom::si::{f64::Length, length::light_year, time::year};
+
+        central_body.set_distance_at_epoch(Length::new::<light_year>(0.));
         CelestialSystem {
             central_body,
             planets: vec![],
             distant_stars: vec![],
             constellations: vec![],
-            time_since_epoch: TIME_ZERO,
+            time_since_epoch: Time::new::<year>(0.),
         }
     }
 
     pub(crate) fn empty() -> Self {
-        let central_body_params =
-            StarPhysicalParameters::new(None, None, LUMINOSITY_ZERO, TEMPERATURE_ZERO);
+        let central_body_params = StarPhysicalParameters::new(
+            None,
+            None,
+            LuminousIntensity::new::<candela>(0.),
+            ThermodynamicTemperature::new::<kelvin>(0.),
+        );
         let central_body = StarData::new(
             "".to_string(),
             None,
             central_body_params,
-            Cartesian::ORIGIN,
-            StarDataEvolution::NONE,
+            Cartesian::origin(),
+            StarDataEvolution::none(),
         );
         CelestialSystem {
             central_body,
             planets: vec![],
             distant_stars: vec![],
             constellations: vec![],
-            time_since_epoch: TIME_ZERO,
+            time_since_epoch: Time::new::<year>(0.),
         }
     }
 
-    pub(crate) fn set_time_since_epoch(&mut self, time_since_epoch: Time<f64>) {
+    pub(crate) fn set_time_since_epoch(&mut self, time_since_epoch: Time) {
         self.time_since_epoch = time_since_epoch;
         for star in &mut self.distant_stars {
             star.recalculate_appearance_if_necessary(time_since_epoch);
@@ -67,7 +77,7 @@ impl CelestialSystem {
         self.update_constellations();
     }
 
-    pub(crate) fn get_time_since_epoch(&self) -> Time<f64> {
+    pub(crate) fn get_time_since_epoch(&self) -> Time {
         self.time_since_epoch
     }
 

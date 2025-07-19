@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 
 use astro_utils::{planets::planet_data::PlanetData, real_data::planets::*};
+use uom::si::f64::Length;
 
 use crate::model::planet::Planet;
 
@@ -18,7 +19,7 @@ impl CelestialSystem {
     }
 
     fn sort_planets_by_semimajor_axis(&mut self) {
-        fn sma(a: &PlanetData) -> simple_si_units::base::Distance<f64> {
+        fn sma(a: &PlanetData) -> Length {
             a.get_orbital_parameters().get_semi_major_axis()
         }
         self.planets
@@ -32,16 +33,16 @@ impl CelestialSystem {
 
     pub(crate) fn load_real_planets(&mut self) {
         self.planets.clear();
-        self.add_planet_data(MERCURY.to_planet_data());
-        self.add_planet_data(VENUS.to_planet_data());
-        self.add_planet_data(EARTH.to_planet_data());
-        self.add_planet_data(MARS.to_planet_data());
-        self.add_planet_data(CERES.to_planet_data());
-        self.add_planet_data(JUPITER.to_planet_data());
-        self.add_planet_data(SATURN.to_planet_data());
-        self.add_planet_data(URANUS.to_planet_data());
-        self.add_planet_data(NEPTUNE.to_planet_data());
-        self.add_planet_data(PLUTO.to_planet_data());
+        self.add_planet_data(mercury().to_planet_data());
+        self.add_planet_data(venus().to_planet_data());
+        self.add_planet_data(earth().to_planet_data());
+        self.add_planet_data(mars().to_planet_data());
+        self.add_planet_data(ceres().to_planet_data());
+        self.add_planet_data(jupiter().to_planet_data());
+        self.add_planet_data(saturn().to_planet_data());
+        self.add_planet_data(uranus().to_planet_data());
+        self.add_planet_data(neptune().to_planet_data());
+        self.add_planet_data(pluto().to_planet_data());
     }
 
     pub(crate) fn get_planets_data(&self) -> Vec<&PlanetData> {
@@ -86,10 +87,10 @@ mod tests {
     #[test]
     fn planets_are_sorted_by_semimajor_axis() {
         let mut system = CelestialSystem::empty();
-        system.add_planet_data(VENUS.to_planet_data());
-        system.add_planet_data(MERCURY.to_planet_data());
-        system.add_planet_data(MARS.to_planet_data());
-        system.add_planet_data(EARTH.to_planet_data());
+        system.add_planet_data(venus().to_planet_data());
+        system.add_planet_data(mercury().to_planet_data());
+        system.add_planet_data(mars().to_planet_data());
+        system.add_planet_data(earth().to_planet_data());
         let planets = system.get_planets_data();
         assert_eq!(planets[0].get_name(), "Mercury");
         assert_eq!(planets[1].get_name(), "Venus");
@@ -100,9 +101,9 @@ mod tests {
     #[test]
     fn edited_planets_are_sorted_by_semimajor_axis() {
         let mut system = CelestialSystem::empty();
-        system.add_planet_data(MERCURY.to_planet_data());
-        system.add_planet_data(EARTH.to_planet_data());
-        system.overwrite_planet_data(0, JUPITER.to_planet_data());
+        system.add_planet_data(mercury().to_planet_data());
+        system.add_planet_data(earth().to_planet_data());
+        system.overwrite_planet_data(0, jupiter().to_planet_data());
         let planets = system.get_planets_data();
         assert_eq!(planets[0].get_name(), "Earth");
         assert_eq!(planets[1].get_name(), "Jupiter");

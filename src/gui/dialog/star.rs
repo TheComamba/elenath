@@ -6,22 +6,24 @@ use astro_utils::{
         random::random_stars::generate_random_star,
     },
     units::{
-        distance::{distance_to_sun_radii, DISTANCE_ZERO, SOLAR_RADIUS},
+        length::solar_radii,
         luminous_intensity::{
             absolute_magnitude_to_luminous_intensity, luminous_intensity_to_absolute_magnitude,
-            LUMINOSITY_ZERO,
         },
-        mass::SOLAR_MASS,
-        temperature::TEMPERATURE_ZERO,
+        mass::solar_mass,
+        time::gigayear,
     },
 };
 use iced::{
     widget::{text::Shaping, Button, Column, Row, Text},
-    Alignment, Element, Length,
+    Alignment, Element, Length as IcedLength,
 };
-use simple_si_units::{
-    base::{Distance, Temperature, Time},
-    geometry::Angle,
+use uom::si::{
+    angle::degree,
+    f64::{Angle, Length, LuminousIntensity, Mass, ThermodynamicTemperature, Time},
+    length::light_year,
+    luminous_intensity::candela,
+    thermodynamic_temperature::kelvin,
 };
 
 use crate::gui::{gui_widget::PADDING, message::GuiMessage, shared_widgets::edit};
@@ -33,7 +35,7 @@ pub(crate) struct StarDialog {
     star_dialog_type: StarDialogType,
     star: StarData,
     star_index: Option<usize>,
-    time_since_epoch: Time<f64>,
+    time_since_epoch: Time,
     mass_string: String,
     radius_string: String,
     luminosity_string: String,
@@ -51,19 +53,28 @@ enum StarDialogType {
     Edit,
 }
 
-const DEFAULT_ECLIPTIC: Ecliptic = Ecliptic {
-    spherical: Spherical::new(Angle { rad: 0. }, Angle { rad: 0. }),
-};
+#[inline(always)]
+fn default_ecliptic() -> Ecliptic {
+    let zero = Angle::new::<degree>(0.);
+    Ecliptic {
+        spherical: Spherical::new(zero, zero),
+    }
+}
 
 impl StarDialog {
-    pub(crate) fn new(time_since_epoch: Time<f64>) -> Self {
-        let params = StarPhysicalParameters::new(None, None, LUMINOSITY_ZERO, TEMPERATURE_ZERO);
+    pub(crate) fn new(time_since_epoch: Time) -> Self {
+        let params = StarPhysicalParameters::new(
+            None,
+            None,
+            LuminousIntensity::new::<candela>(0.),
+            ThermodynamicTemperature::new::<kelvin>(0.),
+        );
         let star = StarData::new(
             String::new(),
             None,
             params,
-            Cartesian::ORIGIN,
-            StarDataEvolution::NONE,
+            Cartesian::origin(),
+            StarDataEvolution::none(),
         );
         let mut dialog = StarDialog {
             star_dialog_type: StarDialogType::New,
@@ -84,11 +95,7 @@ impl StarDialog {
         dialog
     }
 
-    pub(crate) fn edit(
-        star: StarData,
-        star_index: Option<usize>,
-        time_since_epoch: Time<f64>,
-    ) -> Self {
+    pub(crate) fn edit(star: StarData, star_index: Option<usize>, time_since_epoch: Time) -> Self {
         let mut dialog = StarDialog {
             star_dialog_type: StarDialogType::Edit,
             star,
@@ -112,43 +119,49 @@ impl StarDialog {
         self.mass_string = self
             .star
             .get_mass_at_epoch()
-            .map(|mass| format!("{:.2}", mass.to_solar_mass()))
+            .map(|mass| format!("{:.2}", mass.get::<solar_mass>()))
             .unwrap_or_default();
         self.radius_string = self
             .star
             .get_radius_at_epoch()
-            .map(|radius| format!("{:.2}", distance_to_sun_radii(&radius)))
+            .map(|radius| format!("{:.2}", &radius.get::<solar_radii>()))
             .unwrap_or_default();
         self.luminosity_string = format!(
             "{:.2}",
             luminous_intensity_to_absolute_magnitude(self.star.get_luminous_intensity_at_epoch())
         );
-        self.temperature_string = format!("{:.0}", self.star.get_temperature_at_epoch().to_K());
+        self.temperature_string = format!(
+            "{:.0}",
+            self.star.get_temperature_at_epoch().get::<kelvin>()
+        );
         self.age_string = self
             .star
             .get_age_at_epoch()
-            .map(|age| format!("{:.2}", age.to_Gyr()))
+            .map(|age| format!("{:.2}", age.get::<gigayear>()))
             .unwrap_or_default();
-        self.distance_string = format!("{:.2}", self.star.get_distance_at_epoch().to_lyr());
+        self.distance_string = format!(
+            "{:.2}",
+            self.star.get_distance_at_epoch().get::<light_year>()
+        );
         self.longitude_string = format!(
             "{:.2}",
             self.star
                 .get_pos_at_epoch()
                 .to_ecliptic()
-                .unwrap_or(DEFAULT_ECLIPTIC)
+                .unwrap_or(default_ecliptic())
                 .spherical
                 .longitude
-                .to_degrees()
+                .get::<degree>()
         );
         self.latitude_string = format!(
             "{:.2}",
             self.star
                 .get_pos_at_epoch()
                 .to_ecliptic()
-                .unwrap_or(DEFAULT_ECLIPTIC)
+                .unwrap_or(default_ecliptic())
                 .spherical
                 .latitude
-                .to_degrees()
+                .get::<degree>()
         );
     }
 
@@ -215,7 +228,7 @@ impl StarDialog {
                 self.star
                     .get_pos_at_epoch()
                     .to_ecliptic()
-                    .unwrap_or(DEFAULT_ECLIPTIC)
+                    .unwrap_or(default_ecliptic())
                     .spherical
                     .longitude,
             ),
@@ -229,7 +242,7 @@ impl StarDialog {
                 self.star
                     .get_pos_at_epoch()
                     .to_ecliptic()
-                    .unwrap_or(DEFAULT_ECLIPTIC)
+                    .unwrap_or(default_ecliptic())
                     .spherical
                     .latitude,
             ),
@@ -261,7 +274,7 @@ impl StarDialog {
         }
         col.push(submit_button)
             .spacing(PADDING)
-            .width(Length::Fill)
+            .width(IcedLength::Fill)
             .align_x(Alignment::Center)
             .into()
     }
@@ -362,7 +375,7 @@ impl StarDialog {
                     .star
                     .get_pos(self.time_since_epoch)
                     .to_ecliptic()
-                    .unwrap_or(DEFAULT_ECLIPTIC)
+                    .unwrap_or(default_ecliptic())
                     .spherical
                     .longitude
                     .astro_display(),
@@ -375,7 +388,7 @@ impl StarDialog {
                     .star
                     .get_pos(self.time_since_epoch)
                     .to_ecliptic()
-                    .unwrap_or(DEFAULT_ECLIPTIC)
+                    .unwrap_or(default_ecliptic())
                     .spherical
                     .latitude
                     .astro_display(),
@@ -398,7 +411,7 @@ impl StarDialog {
             .push(current_longitude)
             .push(current_latitude)
             .spacing(PADDING)
-            .width(Length::Fill)
+            .width(IcedLength::Fill)
             .align_x(Alignment::Center)
             .into()
     }
@@ -431,13 +444,15 @@ impl Dialog for StarDialog {
                 }
                 StarDialogEvent::MassChanged(mass_string) => {
                     if let Ok(mass) = mass_string.parse::<f64>() {
-                        self.star.set_mass_at_epoch(Some(mass * SOLAR_MASS));
+                        self.star
+                            .set_mass_at_epoch(Some(Mass::new::<solar_mass>(mass)));
                     }
                     self.mass_string = mass_string;
                 }
                 StarDialogEvent::RadiusChanged(radius_string) => {
                     if let Ok(radius) = radius_string.parse::<f64>() {
-                        self.star.set_radius_at_epoch(Some(radius * SOLAR_RADIUS));
+                        self.star
+                            .set_radius_at_epoch(Some(Length::new::<solar_radii>(radius)));
                     }
                     self.radius_string = radius_string;
                 }
@@ -451,21 +466,22 @@ impl Dialog for StarDialog {
                 }
                 StarDialogEvent::TemperatureChanged(temperature_string) => {
                     if let Ok(temperature) = temperature_string.parse::<f64>() {
-                        self.star
-                            .set_temperature_at_epoch(Temperature::from_K(temperature));
+                        self.star.set_temperature_at_epoch(
+                            ThermodynamicTemperature::new::<kelvin>(temperature),
+                        );
                     }
                     self.temperature_string = temperature_string;
                 }
                 StarDialogEvent::AgeChanged(age_string) => {
                     if let Ok(age) = age_string.parse::<f64>() {
-                        self.star.set_age_at_epoch(Some(Time::from_Gyr(age)));
+                        self.star.set_age_at_epoch(Some(Time::new::<gigayear>(age)));
                     }
                     self.age_string = age_string;
                 }
                 StarDialogEvent::DistanceChanged(distance_string) => {
                     if let Ok(distance) = distance_string.parse::<f64>() {
                         self.star
-                            .set_distance_at_epoch(Distance::from_lyr(distance));
+                            .set_distance_at_epoch(Length::new::<light_year>(distance));
                     }
                     self.distance_string = distance_string;
                 }
@@ -475,8 +491,8 @@ impl Dialog for StarDialog {
                             .star
                             .get_pos_at_epoch()
                             .to_ecliptic()
-                            .unwrap_or(DEFAULT_ECLIPTIC);
-                        pos.spherical.longitude = Angle::from_degrees(longitude);
+                            .unwrap_or(default_ecliptic());
+                        pos.spherical.longitude = Angle::new::<degree>(longitude);
                         let pos = pos
                             .to_direction()
                             .to_cartesian(self.star.get_distance_at_epoch());
@@ -490,8 +506,8 @@ impl Dialog for StarDialog {
                             .star
                             .get_pos_at_epoch()
                             .to_ecliptic()
-                            .unwrap_or(DEFAULT_ECLIPTIC);
-                        pos.spherical.latitude = Angle::from_degrees(latitude);
+                            .unwrap_or(default_ecliptic());
+                        pos.spherical.latitude = Angle::new::<degree>(latitude);
                         let pos = pos
                             .to_direction()
                             .to_cartesian(self.star.get_distance_at_epoch());
@@ -507,7 +523,7 @@ impl Dialog for StarDialog {
                     }
                 }
                 StarDialogEvent::Randomize => {
-                    let max_distance = Distance::from_lyr(2000.);
+                    let max_distance = Length::new::<light_year>(2000.);
                     let name = self.star.get_name().clone();
                     self.star = match generate_random_star(Some(max_distance)) {
                         Ok(star) => star,
@@ -528,7 +544,7 @@ impl Dialog for StarDialog {
             StarDialogType::Edit => {
                 let mut star = self.star.clone();
                 if self.is_central_body() {
-                    star.set_distance_at_epoch(DISTANCE_ZERO);
+                    star.set_distance_at_epoch(Length::new::<light_year>(0.));
                 }
                 return GuiMessage::StarEdited(self.star_index, star);
             }

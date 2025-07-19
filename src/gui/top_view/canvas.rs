@@ -3,14 +3,17 @@ use astro_coords::{
     transformations::rotations::get_rotation_parameters,
 };
 use astro_utils::{
-    astro_display::AstroDisplay, color::srgb::sRGBColor, units::distance::DISTANCE_ZERO,
+    astro_display::AstroDisplay, color::srgb::sRGBColor, units::length::solar_radii,
 };
 use iced::{
     alignment::Horizontal,
     widget::canvas::{self, Path, Style},
     Color, Point, Rectangle, Renderer, Vector,
 };
-use simple_si_units::{base::Distance, geometry::Angle};
+use uom::si::{
+    f64::{Angle, Length},
+    length::kilometer,
+};
 
 use crate::{
     gui::shared_canvas_functionality::{
@@ -25,13 +28,13 @@ impl TopViewState {
     fn canvas_position(
         &self,
         pos: &Cartesian,
-        view_angle: Angle<f64>,
+        view_angle: Angle,
         view_rotation_axis: &Direction,
     ) -> Vector {
         let rotated_position = pos.rotated(-view_angle, view_rotation_axis); //passive transformation
-        let x = rotated_position.x / self.length_per_pixel;
-        let y = -rotated_position.y / self.length_per_pixel; // y axis is inverted
-        Vector::new(x as f32, y as f32)
+        let x = (rotated_position.x / self.length_per_pixel).value as f32;
+        let y = (-rotated_position.y / self.length_per_pixel).value as f32; // y axis is inverted
+        Vector::new(x, y)
     }
 
     pub(crate) fn canvas(
@@ -121,9 +124,11 @@ impl TopViewState {
     ) {
         let time = celestial_system.get_time_since_epoch();
         let data = celestial_system.get_central_body_data();
-        let pos3d = Cartesian::ORIGIN;
+        let pos3d = Cartesian::origin();
         let color = sRGBColor::from_temperature(data.get_temperature(time));
-        let radius = data.get_radius(time).unwrap_or(DISTANCE_ZERO);
+        let radius = data
+            .get_radius(time)
+            .unwrap_or(Length::new::<solar_radii>(0.));
         let body = BodyParams {
             name: data.get_name(),
             pos3d: &pos3d,
@@ -180,7 +185,7 @@ impl TopViewState {
 
         let text = canvas::Text {
             color: Color::WHITE,
-            content: (LENGTH_IN_PX * self.length_per_pixel).astro_display(),
+            content: (LENGTH_IN_PX as f64 * self.length_per_pixel).astro_display(),
             position: middle_pos,
             horizontal_alignment: Horizontal::Center,
             ..Default::default()
@@ -189,9 +194,9 @@ impl TopViewState {
     }
 }
 
-fn canvas_radius(radius: &Distance<f64>) -> f32 {
+fn canvas_radius(radius: &Length) -> f32 {
     const SIZE_NUMBER: f32 = 0.3;
-    (radius.to_km() as f32).powf(SIZE_NUMBER) * SIZE_NUMBER
+    (radius.get::<kilometer>() as f32).powf(SIZE_NUMBER) * SIZE_NUMBER
 }
 
 fn canvas_color(color: &sRGBColor, albedo: Option<f64>) -> Color {
@@ -210,11 +215,11 @@ struct BodyParams<'a> {
     pos3d: &'a Cartesian,
     color: &'a sRGBColor,
     albedo: Option<f64>,
-    radius: Distance<f64>,
+    radius: Length,
 }
 
 struct ViewParams<'a> {
-    view_angle: Angle<f64>,
+    view_angle: Angle,
     rotation_axis: &'a Direction,
     offset: Vector,
     display_names: bool,

@@ -2,10 +2,13 @@ use astro_coords::ecliptic::Ecliptic;
 use astro_utils::{astro_display::AstroDisplay, units::angle::normalized_angle};
 use iced::{
     widget::{canvas::Cache, Column},
-    Alignment, Element, Length,
+    Alignment, Element, Length as IcedLength,
 };
-use simple_si_units::{base::Distance, geometry::Angle};
-use std::f64::consts::PI;
+use uom::si::{
+    angle::degree,
+    f64::{Angle, Length},
+    length::astronomical_unit,
+};
 
 use crate::gui::{
     gui_widget::{BIG_COLUMN_WIDTH, PADDING},
@@ -17,15 +20,15 @@ pub(crate) struct TopViewState {
     pub(super) background_cache: Cache,
     pub(super) bodies_cache: Cache,
     pub(super) scale_cache: Cache,
-    pub(super) length_per_pixel: Distance<f64>,
+    pub(super) length_per_pixel: Length,
     pub(super) view_ecliptic: Ecliptic,
 }
 
 #[derive(Debug, Clone)]
 pub(crate) enum TopViewUpdate {
-    LengthScale(Distance<f64>),
-    ViewLongitude(Angle<f64>),
-    ViewLatitude(Angle<f64>),
+    LengthScale(Length),
+    ViewLongitude(Angle),
+    ViewLatitude(Angle),
 }
 
 impl From<TopViewUpdate> for GuiMessage {
@@ -40,8 +43,8 @@ impl TopViewState {
             background_cache: Cache::default(),
             bodies_cache: Cache::default(),
             scale_cache: Cache::default(),
-            length_per_pixel: Distance::from_au(0.01),
-            view_ecliptic: Ecliptic::Z_DIRECTION,
+            length_per_pixel: Length::new::<astronomical_unit>(0.01),
+            view_ecliptic: Ecliptic::z_direction(),
         }
     }
 
@@ -55,10 +58,10 @@ impl TopViewState {
                 self.view_ecliptic.spherical.longitude = longitude;
             }
             TopViewUpdate::ViewLatitude(mut latitude) => {
-                if latitude.to_degrees() < -90. {
-                    latitude = Angle::from_degrees(-90.);
-                } else if latitude.to_degrees() > 90. {
-                    latitude = Angle::from_degrees(90.);
+                if latitude.get::<degree>() < -90. {
+                    latitude = Angle::new::<degree>(-90.);
+                } else if latitude.get::<degree>() > 90. {
+                    latitude = Angle::new::<degree>(90.);
                 }
                 self.view_ecliptic.spherical.latitude = latitude;
             }
@@ -77,28 +80,26 @@ impl TopViewState {
             TopViewUpdate::LengthScale(self.length_per_pixel / 2.),
             TopViewUpdate::LengthScale(self.length_per_pixel * 2.),
         );
-        const VIEW_ANGLE_STEP: Angle<f64> = Angle {
-            rad: 10. * 2. * PI / 360.,
-        };
+        let view_angle_step: Angle = Angle::new::<degree>(10.0);
         let view_longitude = self.view_ecliptic.spherical.longitude;
         let view_longitude_control_field = control_field(
             "View longitude:",
             view_longitude.astro_display(),
-            TopViewUpdate::ViewLongitude(view_longitude - VIEW_ANGLE_STEP),
-            TopViewUpdate::ViewLongitude(view_longitude + VIEW_ANGLE_STEP),
+            TopViewUpdate::ViewLongitude(view_longitude - view_angle_step),
+            TopViewUpdate::ViewLongitude(view_longitude + view_angle_step),
         );
         let view_latitude = self.view_ecliptic.spherical.latitude;
         let view_latitude_control_field = control_field(
             "View latitude:",
             view_latitude.astro_display(),
-            TopViewUpdate::ViewLatitude(view_latitude - VIEW_ANGLE_STEP),
-            TopViewUpdate::ViewLatitude(view_latitude + VIEW_ANGLE_STEP),
+            TopViewUpdate::ViewLatitude(view_latitude - view_angle_step),
+            TopViewUpdate::ViewLatitude(view_latitude + view_angle_step),
         );
         Column::new()
             .push(length_scale_control_field)
             .push(view_longitude_control_field)
             .push(view_latitude_control_field)
-            .width(Length::Fixed(BIG_COLUMN_WIDTH))
+            .width(IcedLength::Fixed(BIG_COLUMN_WIDTH))
             .align_x(Alignment::Center)
             .spacing(PADDING)
             .into()

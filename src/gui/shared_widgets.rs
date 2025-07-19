@@ -11,7 +11,7 @@ use iced::{
     Alignment, Length,
 };
 use iced_aw::Element;
-use simple_si_units::base::Time;
+use uom::si::f64::Time;
 
 impl Gui {
     pub(super) fn gui_mode_tabs() -> Element<'static, GuiMessage> {
@@ -105,8 +105,8 @@ pub(super) fn planet_picker<'a>(
 }
 
 pub(super) fn surface_and_top_view_shared_control<'a>(
-    time_since_epoch: Time<f64>,
-    time_step: Time<f64>,
+    time_since_epoch: Time,
+    time_step: Time,
     planets: Vec<&PlanetData>,
     selected_planet: Option<&PlanetData>,
     display_names: bool,
@@ -196,7 +196,7 @@ pub(crate) fn edit<'a, Fun, Mes, Val>(
 where
     Fun: 'a + Fn(String) -> Mes,
     Mes: 'a + Clone,
-    Val: 'a + ToString,
+    Val: 'a + AstroDisplay,
 {
     let description = if description.ends_with(':') {
         description.to_string()
@@ -213,7 +213,7 @@ where
         .shaping(Shaping::Advanced)
         .width(SMALL_COLUMN_WIDTH);
     let parsed_text = match actual_value {
-        Some(value) => "Parsed value:\n".to_string() + &value.to_string(),
+        Some(value) => "Parsed value:\n".to_string() + &value.astro_display(),
         None => "Parsed value:\nNone".to_string(),
     };
     let value = Text::new(parsed_text)

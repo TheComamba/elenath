@@ -1,9 +1,10 @@
 use astro_coords::{direction::Direction, equatorial::Equatorial, spherical::Spherical, traits::*};
 use astro_utils::planets::{planet_data::PlanetData, surface_normal::surface_normal_at_time};
 use iced::Rectangle;
-use simple_si_units::{
-    base::Time,
-    geometry::{Angle, SolidAngle},
+use uom::si::{
+    angle::{degree, radian},
+    f64::{Angle, SolidAngle, Time},
+    solid_angle::steradian,
 };
 
 pub(super) struct Viewport {
@@ -16,7 +17,7 @@ impl Viewport {
     pub(super) fn calculate(
         observer_normal: &Direction,
         local_view_direction: &Spherical,
-        opening_angle: SolidAngle<f64>,
+        opening_angle: SolidAngle,
         rotation_axis: &Direction,
         bounds: Rectangle,
     ) -> Self {
@@ -32,11 +33,10 @@ impl Viewport {
         let aspect_ration = bounds.width / bounds.height;
         // A = a * b = a^2 * aspect_ratio
         // a = sqrt(A / aspect_ratio)
-        let vertical_angle = Angle {
-            rad: (opening_angle.sr / aspect_ration as f64).sqrt(),
-        };
+        let vertical_angle = (opening_angle.get::<steradian>() / aspect_ration as f64).sqrt();
+        let vertical_angle = Angle::new::<radian>(vertical_angle);
         let top_direction = center_direction.rotated(vertical_angle / 2., &ortho);
-        let viewport_height = (vertical_angle / 2.).rad.sin() * 2.; //Viewport is at unit distance
+        let viewport_height = (vertical_angle / 2.).get::<radian>().sin() * 2.; //Viewport is at unit distance
         let px_per_distance = bounds.height / viewport_height as f32;
         Self {
             center_direction,
@@ -49,12 +49,12 @@ impl Viewport {
 pub(super) fn observer_normal(
     planet: &PlanetData,
     surface_position: Spherical,
-    time_since_epoch: Time<f64>,
+    time_since_epoch: Time,
 ) -> Direction {
     let observer_equatorial_position =
         Equatorial::new(surface_position, planet.get_rotation_axis().clone());
     //TODO: Define Angle at Epoch
-    let planet_angle_at_epoch = Angle::from_degrees(0.0);
+    let planet_angle_at_epoch = Angle::new::<degree>(0.0);
     surface_normal_at_time(
         observer_equatorial_position,
         planet_angle_at_epoch,
@@ -65,18 +65,20 @@ pub(super) fn observer_normal(
 
 #[cfg(test)]
 mod tests {
-    use astro_utils::units::solid_angle::SOLID_ANGLE_ZERO;
-
     use super::*;
 
     const TEST_ACCURACY: f64 = 1e-5;
-    const SOME_SOLID_ANGLE: SolidAngle<f64> = SolidAngle { sr: 1.0 };
     const SOME_SQUARE: Rectangle = Rectangle {
         x: 0.,
         y: 0.,
         width: 100.,
         height: 100.,
     };
+
+    #[inline(always)]
+    fn some_solid_angle() -> SolidAngle {
+        SolidAngle::new::<steradian>(1.0)
+    }
 
     fn example_directions() -> Vec<Direction> {
         let ordinates = vec![-1., 0., 1., 12.];
@@ -97,11 +99,11 @@ mod tests {
     fn view_direction_z_does_not_influence_center_direction_and_makes_rotation_axis_irrelevant() {
         for observer_normal in example_directions().iter() {
             for rotation_axis in example_directions().iter() {
-                let view_direction = Spherical::Z_DIRECTION;
+                let view_direction = Spherical::z_direction();
                 let viewport = Viewport::calculate(
                     &observer_normal,
                     &view_direction,
-                    SOME_SOLID_ANGLE,
+                    some_solid_angle(),
                     &rotation_axis,
                     SOME_SQUARE,
                 );
@@ -116,35 +118,35 @@ mod tests {
     fn tilting_view() {
         let observer_normal = Direction::X;
         let rotation_axis = Direction::Z;
-        let west_view = Spherical::X_DIRECTION;
-        let south_view = Spherical::Y_DIRECTION;
-        let east_view = -Spherical::X_DIRECTION;
-        let north_view = -Spherical::Y_DIRECTION;
+        let west_view = Spherical::x_direction();
+        let south_view = Spherical::y_direction();
+        let east_view = -Spherical::x_direction();
+        let north_view = -Spherical::y_direction();
         let westward_viewport = Viewport::calculate(
             &observer_normal,
             &west_view,
-            SOME_SOLID_ANGLE,
+            some_solid_angle(),
             &rotation_axis,
             SOME_SQUARE,
         );
         let southward_viewport = Viewport::calculate(
             &observer_normal,
             &south_view,
-            SOME_SOLID_ANGLE,
+            some_solid_angle(),
             &rotation_axis,
             SOME_SQUARE,
         );
         let eastward_viewport = Viewport::calculate(
             &observer_normal,
             &east_view,
-            SOME_SOLID_ANGLE,
+            some_solid_angle(),
             &rotation_axis,
             SOME_SQUARE,
         );
         let northward_viewport = Viewport::calculate(
             &observer_normal,
             &north_view,
-            SOME_SOLID_ANGLE,
+            some_solid_angle(),
             &rotation_axis,
             SOME_SQUARE,
         );
@@ -171,7 +173,7 @@ mod tests {
                     let viewport = Viewport::calculate(
                         &observer_normal,
                         &view_direction,
-                        SOME_SOLID_ANGLE,
+                        some_solid_angle(),
                         &rotation_axis,
                         SOME_SQUARE,
                     );
@@ -200,11 +202,11 @@ mod tests {
     fn opening_angle_zero() {
         let observer_normal = Direction::X;
         let rotation_axis = Direction::Z;
-        let view_direction = Spherical::Z_DIRECTION;
+        let view_direction = Spherical::z_direction();
         let viewport = Viewport::calculate(
             &observer_normal,
             &view_direction,
-            SOLID_ANGLE_ZERO,
+            SolidAngle::new::<steradian>(0.),
             &rotation_axis,
             SOME_SQUARE,
         );
@@ -218,13 +220,13 @@ mod tests {
     fn opening_angle_90_degrees() {
         let observer_normal = Direction::X;
         let rotation_axis = Direction::Z;
-        let view_direction = Spherical::Z_DIRECTION;
-        let opening_angle = Angle::from_degrees(90.0);
+        let view_direction = Spherical::z_direction();
+        let opening_angle = Angle::new::<degree>(90.0);
         let opening_solid_angle = opening_angle * opening_angle;
         let viewport = Viewport::calculate(
             &observer_normal,
             &view_direction,
-            opening_solid_angle,
+            opening_solid_angle.into(),
             &rotation_axis,
             SOME_SQUARE,
         );
@@ -239,13 +241,13 @@ mod tests {
     fn opening_angle_180_degrees() {
         let observer_normal = Direction::X;
         let rotation_axis = Direction::Z;
-        let view_direction = Spherical::Z_DIRECTION;
-        let opening_angle = Angle::from_degrees(180.0);
+        let view_direction = Spherical::z_direction();
+        let opening_angle = Angle::new::<degree>(180.0);
         let opening_solid_angle = opening_angle * opening_angle;
         let viewport = Viewport::calculate(
             &observer_normal,
             &view_direction,
-            opening_solid_angle,
+            opening_solid_angle.into(),
             &rotation_axis,
             SOME_SQUARE,
         );

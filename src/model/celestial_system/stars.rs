@@ -1,6 +1,6 @@
 use astro_coords::cartesian::Cartesian;
 use astro_utils::{
-    real_data::stars::{all::get_many_stars, SUN},
+    real_data::stars::{all::get_many_stars, sun},
     stars::{
         appearance::StarAppearance,
         data::StarData,
@@ -10,9 +10,10 @@ use astro_utils::{
         },
         random::random_stars::{generate_random_star, generate_random_stars},
     },
+    units::illuminance::Illuminance,
 };
-use simple_si_units::base::Distance;
 use std::cmp::Ordering;
+use uom::si::f64::Length;
 
 use crate::{
     error::ElenathError,
@@ -82,12 +83,12 @@ impl CelestialSystem {
     }
 
     fn sort_stars_by_brightness(&mut self) {
-        fn illum(b: &Star) -> &simple_si_units::electromagnetic::Illuminance<f64> {
+        fn illum(b: &Star) -> Illuminance {
             b.get_appearance().get_illuminance()
         }
 
         self.distant_stars
-            .sort_by(|a, b| illum(b).partial_cmp(illum(a)).unwrap_or(Ordering::Equal));
+            .sort_by(|a, b| illum(b).partial_cmp(&illum(a)).unwrap_or(Ordering::Equal));
         for (i, star) in self.distant_stars.iter_mut().enumerate() {
             star.set_index(i);
         }
@@ -96,7 +97,7 @@ impl CelestialSystem {
     pub(crate) fn randomize_stars(
         &mut self,
         keep_central_body: bool,
-        max_distance: Distance<f64>,
+        max_distance: Length,
     ) -> Result<(), ElenathError> {
         if !keep_central_body {
             self.central_body = generate_random_star(None)?
@@ -107,7 +108,7 @@ impl CelestialSystem {
     }
 
     pub(crate) fn load_real_stars(&mut self, data_type: StarDataType) -> Result<(), ElenathError> {
-        self.central_body = SUN.to_star_data();
+        self.central_body = sun().to_star_data();
         self.distant_stars.clear();
         match data_type {
             StarDataType::Hardcoded => {
@@ -179,25 +180,27 @@ impl CelestialSystem {
 
 #[cfg(test)]
 mod tests {
-    use astro_utils::{
-        real_data::stars::{all::get_many_stars, SUN},
-        units::luminous_intensity::absolute_magnitude_to_luminous_intensity,
-    };
-    use simple_si_units::base::Distance;
+    use astro_utils::units::luminous_intensity::absolute_magnitude_to_luminous_intensity;
+    use uom::si::length::light_year;
 
-    use crate::model::celestial_system::{part::PartOfCelestialSystem, CelestialSystem};
+    use crate::model::celestial_system::part::PartOfCelestialSystem;
+
+    use super::*;
 
     #[test]
     fn central_body_has_distance_zero() {
         for star in get_many_stars().iter() {
             let system = CelestialSystem::new(star.to_star_data());
-            assert!(system.get_central_body_data().get_distance_at_epoch() < Distance::from_m(1.));
+            assert!(
+                system.get_central_body_data().get_distance_at_epoch()
+                    < Length::new::<light_year>(1e-20)
+            );
         }
     }
 
     #[test]
     fn stars_are_sorted_by_brightness() {
-        let mut system = CelestialSystem::new(SUN.to_star_data());
+        let mut system = CelestialSystem::new(sun().to_star_data());
         let reverse_stars = get_many_stars()
             .iter()
             .rev()
@@ -215,11 +218,11 @@ mod tests {
 
     #[test]
     fn edited_stars_are_sorted_by_brightness() {
-        let mut system = CelestialSystem::new(SUN.to_star_data());
+        let mut system = CelestialSystem::new(sun().to_star_data());
         let stars = get_many_stars().iter().map(|s| s.to_star_data()).collect();
         system.add_stars_from_data(stars);
-        let mut bright_star = SUN.to_star_data();
-        bright_star.set_distance_at_epoch(Distance::from_lyr(1.));
+        let mut bright_star = sun().to_star_data();
+        bright_star.set_distance_at_epoch(Length::new::<light_year>(1.));
         bright_star.set_luminous_intensity_at_epoch(absolute_magnitude_to_luminous_intensity(-10.));
         system.overwrite_star_data(Some(17), bright_star);
         let stars = system.get_stars();
@@ -233,7 +236,7 @@ mod tests {
 
     #[test]
     fn star_index_is_correct_after_sorting() {
-        let mut system = CelestialSystem::new(SUN.to_star_data());
+        let mut system = CelestialSystem::new(sun().to_star_data());
         let reversed_stars = get_many_stars()
             .iter()
             .rev()

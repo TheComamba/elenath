@@ -18,7 +18,7 @@ use crate::{file_dialog, model::celestial_system::CelestialSystem};
 use astro_utils::planets::derived_data::DerivedPlanetData;
 use astro_utils::planets::planet_data::PlanetData;
 use astro_utils::stars::data::StarData;
-use simple_si_units::base::{Distance, Time};
+use uom::si::f64::{Length, Time};
 
 #[derive(Debug, Clone)]
 pub(crate) enum GuiMessage {
@@ -33,15 +33,15 @@ pub(crate) enum GuiMessage {
     PlanetEdited(usize, PlanetData),
     NewStar(StarData),
     StarEdited(Option<usize>, StarData),
-    UpdateTime(Time<f64>),
-    UpdateTimeStep(Time<f64>),
+    UpdateTime(Time),
+    UpdateTimeStep(Time),
     PlanetSelected(String),
     SetDisplayNames(bool),
     SetDisplayConstellations(bool),
     TableDataTypeSelected(TableDataType),
     RandomizePlanets,
     LoadRealPlanets,
-    RandomizeStars(bool, Distance<f64>),
+    RandomizeStars(bool, Length),
     LoadStars(StarDataType),
     OpenDialog(DialogType),
     DialogUpdate(DialogUpdate),
@@ -217,7 +217,7 @@ impl Gui {
             }
             GuiMessage::DialogSubmit => {
                 if let Some(dialog) = &self.dialog {
-                    self.handle_message(dialog.on_submit());
+                    self.handle_message(dialog.on_submit())?;
                 }
             }
         }

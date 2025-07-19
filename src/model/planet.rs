@@ -3,7 +3,7 @@ use astro_utils::{
     planets::{derived_data::DerivedPlanetData, planet_data::PlanetData},
     stars::data::StarData,
 };
-use simple_si_units::base::Time;
+use uom::si::f64::Time;
 
 use super::celestial_system::part::{BodyType, PartOfCelestialSystem};
 
@@ -19,7 +19,7 @@ impl Planet {
         data: PlanetData,
         central_body: &StarData,
         previous: Option<&DerivedPlanetData>,
-        time: Time<f64>,
+        time: Time,
         index: Option<usize>,
     ) -> Self {
         let derived_data = DerivedPlanetData::new(&data, central_body, previous).ok();
@@ -45,12 +45,12 @@ impl Planet {
     }
 }
 
-fn calc_pos(central_body: &StarData, time: Time<f64>, data: &PlanetData) -> Cartesian {
+fn calc_pos(central_body: &StarData, time: Time, data: &PlanetData) -> Cartesian {
     let pos = if let Some(central_body_mass) = central_body.get_mass(time) {
         data.get_orbital_parameters()
             .calculate_position(data.get_mass(), central_body_mass, time)
     } else {
-        Cartesian::ORIGIN
+        Cartesian::origin()
     };
     pos
 }
