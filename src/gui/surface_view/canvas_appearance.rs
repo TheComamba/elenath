@@ -126,6 +126,7 @@ mod tests {
             orbit_parameters::OrbitParameters, physical_parameters::PlanetPhysicalParameters,
             planet_data::PlanetData,
         },
+        real_data::stars::sun,
         units::{
             illuminance::apparent_magnitude_to_illuminance, length::earth_radii, mass::earth_mass,
         },
@@ -643,7 +644,7 @@ mod tests {
     fn aligned_planet_sun_and_observer() {
         const CENTER: Vector = Vector { x: 0., y: 0. };
 
-        let mut celestial_system = CelestialSystem::new(SUN.to_star_data());
+        let mut celestial_system = CelestialSystem::new(sun().to_star_data());
         let orbit = OrbitParameters::new(
             Length::new::<astronomical_unit>(1.),
             0.,

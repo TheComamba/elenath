@@ -1,6 +1,6 @@
 use astro_coords::cartesian::Cartesian;
 use astro_utils::{
-    real_data::stars::all::get_many_stars,
+    real_data::stars::{all::get_many_stars, sun},
     stars::{
         appearance::StarAppearance,
         data::StarData,
@@ -108,7 +108,7 @@ impl CelestialSystem {
     }
 
     pub(crate) fn load_real_stars(&mut self, data_type: StarDataType) -> Result<(), ElenathError> {
-        self.central_body = SUN.to_star_data();
+        self.central_body = sun().to_star_data();
         self.distant_stars.clear();
         match data_type {
             StarDataType::Hardcoded => {
@@ -180,13 +180,12 @@ impl CelestialSystem {
 
 #[cfg(test)]
 mod tests {
-    use astro_utils::{
-        real_data::stars::all::get_many_stars,
-        units::luminous_intensity::absolute_magnitude_to_luminous_intensity,
-    };
-    use uom::si::{f64::Length, length::light_year};
+    use astro_utils::units::luminous_intensity::absolute_magnitude_to_luminous_intensity;
+    use uom::si::length::light_year;
 
-    use crate::model::celestial_system::{part::PartOfCelestialSystem, CelestialSystem};
+    use crate::model::celestial_system::part::PartOfCelestialSystem;
+
+    use super::*;
 
     #[test]
     fn central_body_has_distance_zero() {
@@ -201,7 +200,7 @@ mod tests {
 
     #[test]
     fn stars_are_sorted_by_brightness() {
-        let mut system = CelestialSystem::new(SUN.to_star_data());
+        let mut system = CelestialSystem::new(sun().to_star_data());
         let reverse_stars = get_many_stars()
             .iter()
             .rev()
@@ -219,10 +218,10 @@ mod tests {
 
     #[test]
     fn edited_stars_are_sorted_by_brightness() {
-        let mut system = CelestialSystem::new(SUN.to_star_data());
+        let mut system = CelestialSystem::new(sun().to_star_data());
         let stars = get_many_stars().iter().map(|s| s.to_star_data()).collect();
         system.add_stars_from_data(stars);
-        let mut bright_star = SUN.to_star_data();
+        let mut bright_star = sun().to_star_data();
         bright_star.set_distance_at_epoch(Length::new::<light_year>(1.));
         bright_star.set_luminous_intensity_at_epoch(absolute_magnitude_to_luminous_intensity(-10.));
         system.overwrite_star_data(Some(17), bright_star);
@@ -237,7 +236,7 @@ mod tests {
 
     #[test]
     fn star_index_is_correct_after_sorting() {
-        let mut system = CelestialSystem::new(SUN.to_star_data());
+        let mut system = CelestialSystem::new(sun().to_star_data());
         let reversed_stars = get_many_stars()
             .iter()
             .rev()
