@@ -3,7 +3,8 @@ use crate::gui::{
     message::GuiMessage,
     shared_widgets::control_field,
 };
-use astro_utils::{astro_display::AstroDisplay, units::angle::normalized_angle};
+use astro_units::angle::normalized_angle;
+use astro_utils::astro_display::AstroDisplay;
 use iced::{
     widget::{canvas, Column},
     Alignment, Element, Length,

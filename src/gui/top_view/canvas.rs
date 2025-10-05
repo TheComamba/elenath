@@ -2,9 +2,8 @@ use astro_coords::{
     cartesian::Cartesian, direction::Direction, traits::*,
     transformations::rotations::get_rotation_parameters,
 };
-use astro_utils::{
-    astro_display::AstroDisplay, color::srgb::sRGBColor, units::length::solar_radii,
-};
+use astro_units::length::solar_radius;
+use astro_utils::{astro_display::AstroDisplay, color::srgb::sRGBColor};
 use iced::{
     alignment::Horizontal,
     widget::canvas::{self, Path, Style},
@@ -128,7 +127,7 @@ impl TopViewState {
         let color = sRGBColor::from_temperature(data.get_temperature(time));
         let radius = data
             .get_radius(time)
-            .unwrap_or(Length::new::<solar_radii>(0.));
+            .unwrap_or(Length::new::<solar_radius>(0.));
         let body = BodyParams {
             name: data.get_name(),
             pos3d: &pos3d,

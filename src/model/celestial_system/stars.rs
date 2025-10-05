@@ -1,4 +1,5 @@
 use astro_coords::cartesian::Cartesian;
+use astro_units::illuminance::Illuminance;
 use astro_utils::{
     real_data::stars::{all::get_many_stars, sun},
     stars::{
@@ -10,7 +11,6 @@ use astro_utils::{
         },
         random::random_stars::{generate_random_star, generate_random_stars},
     },
-    units::illuminance::Illuminance,
 };
 use std::cmp::Ordering;
 use uom::si::f64::Length;
@@ -180,7 +180,7 @@ impl CelestialSystem {
 
 #[cfg(test)]
 mod tests {
-    use astro_utils::units::luminous_intensity::absolute_magnitude_to_luminous_intensity;
+    use astro_units::luminous_intensity::absolute_magnitude_to_luminous_intensity;
     use uom::si::length::light_year;
 
     use crate::model::celestial_system::part::PartOfCelestialSystem;

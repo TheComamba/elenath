@@ -1,17 +1,17 @@
 use astro_coords::{cartesian::Cartesian, ecliptic::Ecliptic, spherical::Spherical};
+use astro_units::{
+    length::solar_radius,
+    luminous_intensity::{
+        absolute_magnitude_to_luminous_intensity, luminous_intensity_to_absolute_magnitude,
+    },
+    mass::solar_mass,
+    time::gigayear,
+};
 use astro_utils::{
     astro_display::AstroDisplay,
     stars::{
         data::StarData, evolution::StarDataEvolution, physical_parameters::StarPhysicalParameters,
         random::random_stars::generate_random_star,
-    },
-    units::{
-        length::solar_radii,
-        luminous_intensity::{
-            absolute_magnitude_to_luminous_intensity, luminous_intensity_to_absolute_magnitude,
-        },
-        mass::solar_mass,
-        time::gigayear,
     },
 };
 use iced::{
@@ -124,7 +124,7 @@ impl StarDialog {
         self.radius_string = self
             .star
             .get_radius_at_epoch()
-            .map(|radius| format!("{:.2}", &radius.get::<solar_radii>()))
+            .map(|radius| format!("{:.2}", &radius.get::<solar_radius>()))
             .unwrap_or_default();
         self.luminosity_string = format!(
             "{:.2}",
@@ -452,7 +452,7 @@ impl Dialog for StarDialog {
                 StarDialogEvent::RadiusChanged(radius_string) => {
                     if let Ok(radius) = radius_string.parse::<f64>() {
                         self.star
-                            .set_radius_at_epoch(Some(Length::new::<solar_radii>(radius)));
+                            .set_radius_at_epoch(Some(Length::new::<solar_radius>(radius)));
                     }
                     self.radius_string = radius_string;
                 }

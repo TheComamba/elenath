@@ -1,11 +1,8 @@
 use astro_coords::{
     cartesian::Cartesian, transformations::relative_direction::direction_relative_to_normal,
 };
-use astro_utils::{
-    color::srgb::sRGBColor,
-    stars::appearance::StarAppearance,
-    units::illuminance::{lux, Illuminance},
-};
+use astro_units::illuminance::{lux, Illuminance};
+use astro_utils::{color::srgb::sRGBColor, stars::appearance::StarAppearance};
 use iced::{Color, Vector};
 
 use crate::model::{celestial_system::CelestialSystem, planet::Planet};
@@ -119,6 +116,9 @@ fn offset(appearance: &StarAppearance, viewport: &Viewport) -> Option<Vector> {
 #[cfg(test)]
 mod tests {
     use astro_coords::{direction::Direction, ecliptic::Ecliptic, traits::*};
+    use astro_units::{
+        illuminance::apparent_magnitude_to_illuminance, length::earth_radius, mass::earth_mass,
+    };
     use astro_utils::{
         astro_display::AstroDisplay,
         color::srgb::sRGBColor,
@@ -127,9 +127,6 @@ mod tests {
             planet_data::PlanetData,
         },
         real_data::stars::sun,
-        units::{
-            illuminance::apparent_magnitude_to_illuminance, length::earth_radii, mass::earth_mass,
-        },
     };
     use uom::si::{
         angle::{degree, radian},
@@ -654,7 +651,7 @@ mod tests {
         );
         let planet_physical_params = PlanetPhysicalParameters::new(
             Mass::new::<earth_mass>(1.),
-            Length::new::<earth_radii>(1.),
+            Length::new::<earth_radius>(1.),
             1.,
             sRGBColor::from_sRGB(1., 1., 1.),
             Time::new::<year>(0.),

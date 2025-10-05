@@ -1,4 +1,5 @@
 use astro_coords::direction::Direction;
+use astro_units::{length::earth_radius, mass::earth_mass};
 use astro_utils::{
     astro_display::AstroDisplay,
     color::srgb::sRGBColor,
@@ -8,7 +9,6 @@ use astro_utils::{
         random_planets::generate_random_planet,
     },
     stars::data::StarData,
-    units::{length::earth_radii, mass::earth_mass},
 };
 use iced::{
     widget::{text::Shaping, Button, Column, Row, Text},
@@ -84,7 +84,7 @@ impl PlanetDialog {
     pub(crate) fn new(central_body: StarData) -> Result<Self, ElenathError> {
         let physical_parameters = PlanetPhysicalParameters::new(
             Mass::new::<earth_mass>(0.),
-            Length::new::<earth_radii>(0.),
+            Length::new::<earth_radius>(0.),
             0.0,
             sRGBColor::from_sRGB(0., 0., 0.),
             Time::new::<day>(0.),
@@ -122,7 +122,7 @@ impl PlanetDialog {
 
     fn fill_string_members(&mut self) -> Result<(), ElenathError> {
         self.mass_string = format!("{:.2}", self.planet.get_mass().get::<earth_mass>());
-        self.radius_string = format!("{:.2}", &self.planet.get_radius().get::<earth_radii>());
+        self.radius_string = format!("{:.2}", &self.planet.get_radius().get::<earth_radius>());
         self.color_string = serde_json::to_string(self.planet.get_color()).map_err(|e| {
             ElenathError::Generic(format!("Converting planet color to json failed: {:?}", e))
         })?;
@@ -401,7 +401,7 @@ impl Dialog for PlanetDialog {
                 }
                 PlanetDialogEvent::RadiusChanged(radius_string) => {
                     if let Ok(radius) = radius_string.parse::<f64>() {
-                        self.planet.set_radius(Length::new::<earth_radii>(radius));
+                        self.planet.set_radius(Length::new::<earth_radius>(radius));
                         self.radius_string = radius_string;
                     }
                 }

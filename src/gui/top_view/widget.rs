@@ -1,5 +1,6 @@
 use astro_coords::ecliptic::Ecliptic;
-use astro_utils::{astro_display::AstroDisplay, units::angle::normalized_angle};
+use astro_units::angle::normalized_angle;
+use astro_utils::astro_display::AstroDisplay;
 use iced::{
     widget::{canvas::Cache, Column},
     Alignment, Element, Length as IcedLength,
