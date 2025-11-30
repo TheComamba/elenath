@@ -149,7 +149,7 @@ version = "0.1.0"
 source = "git+https://github.com/TheComamba/astro_coords.git?branch=main#9b8f9f8a2fbd4c2c04865c70938ceb82bbc0795d"
 dependencies = [
  "serde",
- "uom",
+ "uom 0.36.0",
 ]
 
 [[package]]
@@ -157,7 +157,7 @@ name = "astro_units"
 version = "1.0.0"
 source = "git+https://github.com/TheComamba/astro_units.git?branch=main#519177b664c8489d5a89112d9cb651e81fef9aac"
 dependencies = [
- "uom",
+ "uom 0.36.0",
 ]
 
 [[package]]
@@ -181,7 +181,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tar",
- "uom",
+ "uom 0.36.0",
 ]
 
 [[package]]
@@ -925,7 +925,7 @@ dependencies = [
  "rfd",
  "serde",
  "serde_json",
- "uom",
+ "uom 0.37.0",
 ]
 
 [[package]]
@@ -2907,7 +2907,7 @@ dependencies = [
  "rayon",
  "reqwest",
  "tar",
- "uom",
+ "uom 0.36.0",
 ]
 
 [[package]]
@@ -4237,6 +4237,16 @@ dependencies = [
  "num-rational",
  "num-traits",
  "serde",
+ "typenum",
+]
+
+[[package]]
+name = "uom"
+version = "0.37.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cd5cfe7d84f6774726717f358a37f5bca8fca273bed4de40604ad129d1107b49"
+dependencies = [
+ "num-traits",
  "typenum",
 ]
 
