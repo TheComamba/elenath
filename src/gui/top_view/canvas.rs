@@ -5,8 +5,10 @@ use astro_coords::{
 use astro_units::length::solar_radius;
 use astro_utils::{astro_display::AstroDisplay, color::srgb::sRGBColor};
 use iced::{
-    alignment::Horizontal,
-    widget::canvas::{self, Path, Style},
+    widget::{
+        canvas::{self, Path, Style},
+        text::Alignment,
+    },
     Color, Point, Rectangle, Renderer, Vector,
 };
 use uom::si::{
@@ -186,7 +188,7 @@ impl TopViewState {
             color: Color::WHITE,
             content: (LENGTH_IN_PX as f64 * self.length_per_pixel).astro_display(),
             position: middle_pos,
-            horizontal_alignment: Horizontal::Center,
+            align_x: Alignment::Center,
             ..Default::default()
         };
         frame.fill_text(text);

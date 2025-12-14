@@ -10,9 +10,10 @@ use crate::{
 };
 use iced::{
     widget::{
+        rule,
         scrollable::{Direction, Scrollbar},
         text::Shaping,
-        Button, Column, Container, Row, Rule, Scrollable, Text,
+        Button, Column, Container, Row, Scrollable, Text,
     },
     Alignment, Element, Length,
 };
@@ -128,7 +129,7 @@ where
     Scrollable::new(
         Column::new()
             .push(table_header(new_message, &col_data))
-            .push(Container::new(Rule::horizontal(10)).width(width))
+            .push(Container::new(rule::horizontal(10)).width(width))
             .push(table_contents(bodies, col_data)),
     )
     .direction(Direction::Horizontal(scrollbar))

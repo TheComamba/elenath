@@ -1,8 +1,8 @@
 use iced::{
-    alignment::{Horizontal, Vertical},
+    alignment::Vertical,
     widget::{
         canvas::{self, Path},
-        text::Shaping,
+        text::{Alignment, Shaping},
     },
     Color, Pixels, Point, Rectangle, Vector,
 };
@@ -41,8 +41,8 @@ pub(crate) fn display_info_text(frame: &mut canvas::Frame, text: &str) {
         color: Color::WHITE,
         content: text.to_string(),
         position: frame.center(),
-        vertical_alignment: Vertical::Center,
-        horizontal_alignment: Horizontal::Center,
+        align_x: Alignment::Center,
+        align_y: Vertical::Center,
         ..Default::default()
     };
     frame.fill_text(name_widget)

@@ -8,9 +8,8 @@ use astro_utils::{astro_display::AstroDisplay, planets::planet_data::PlanetData}
 use iced::{
     alignment::{Horizontal, Vertical},
     widget::{text::Shaping, Button, Column, Container, PickList, Row, Text, TextInput, Toggler},
-    Alignment, Length,
+    Alignment, Element, Length,
 };
-use iced_aw::Element;
 use uom::si::f64::Time;
 
 impl Gui {

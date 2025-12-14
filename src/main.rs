@@ -18,7 +18,8 @@ fn main() -> Result {
         }),
         ..Default::default()
     };
-    iced::application(APP_TITLE, Gui::update, Gui::view)
+    iced::application(Gui::default, Gui::update, Gui::view)
+        .title(APP_TITLE)
         .antialiasing(true)
         .window(window_settings)
         .run()

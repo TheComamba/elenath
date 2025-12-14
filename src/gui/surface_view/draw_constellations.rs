@@ -8,8 +8,11 @@ use crate::{
 };
 use astro_utils::stars::constellation::Constellation;
 use iced::{
-    alignment::{Horizontal, Vertical},
-    widget::canvas::{Frame, Path, Stroke, Style, Text},
+    alignment,
+    widget::{
+        canvas::{Frame, Path, Stroke, Style, Text},
+        text::Alignment,
+    },
     Color, Pixels, Rectangle, Vector,
 };
 
@@ -67,8 +70,8 @@ impl SurfaceViewState {
                 position,
                 color,
                 size: Pixels(20.),
-                horizontal_alignment: Horizontal::Center,
-                vertical_alignment: Vertical::Center,
+                align_x: Alignment::Center,
+                align_y: alignment::Vertical::Center,
                 ..Default::default()
             };
             frame.fill_text(name_widget);
