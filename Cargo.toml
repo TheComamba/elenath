@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 astro_coords = { git = "https://github.com/TheComamba/astro_coords.git", branch="main" }
 astro_utils = { git = "https://github.com/TheComamba/astro_utils.git", branch="main" }
-astro_units = { git = "https://github.com/TheComamba/astro_units.git", branch="main" }
+astro_units = { version = "1.0", default-features = false, features = [] }
 iced = { version = "0.14.0", default-features = false, features=["wgpu", "canvas", "lazy", "thread-pool", "x11"] }
 iced_aw = { version = "0.13.0", default-features = false, features = ["card"] }
 rfd = "0.16.0" # file dialogs (all default features are needed)
